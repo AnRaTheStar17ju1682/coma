@@ -4,8 +4,14 @@ from typing import Optional, Annotated
 
 from pydantic import ValidationError
 
+
+from config import settings
+
 from models_dto import ImagePostDTO, Str_50, Description_350, Tags
 
+from utils import ImageUtils
+
+from services.image_service import ImagesService
 
 
 async def image_post_dto_dependency(
@@ -33,3 +39,7 @@ async def image_post_dto_dependency(
         copyright = copyright[0].split(",")
         characters = characters[0].split(",")
         return ImagePostDTO(name=name, description=description, tags=tags, meta=meta, copyright=copyright, characters=characters, score=score, source=source)
+
+
+async def image_service_dependency():
+    return ImagesService(images_repo=None, image_utils=ImageUtils(settings.IMAGE_SALT))
