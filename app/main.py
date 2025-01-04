@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, Form, File, Depends, Header, HTTPException
+from fastapi import FastAPI, UploadFile, Form, File, Depends, Header, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
 
 from aiofiles import open as async_open
@@ -28,7 +28,10 @@ async def get_ico():
 
 
 @app.post("/images/", status_code=201)
-async def upload_image(image: UploadFile, image_data: Annotated[ImagePostDTO, Depends(image_post_dto_dependency)]):
+async def upload_image(
+    image: Annotated[bytes, File()],
+    image_data: Annotated[ImagePostDTO, Depends(image_post_dto_dependency)]
+):
     async with async_open(file=f"./content/{image.filename}", mode="wb") as file:
        await file.write(await image.read())
     return image_data

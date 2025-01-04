@@ -10,6 +10,10 @@ Description_350 = Annotated[Optional[str], Field(max_length=350)]
 Tags = Annotated[Optional[Sequence[Str_50]], Field(max_length=100)]
 
 
+class AbstractDTO(BaseModel):
+    ...
+
+
 class ImagePostDTO(BaseModel):
     name: Str_50 = None
     description: Description_350 = None

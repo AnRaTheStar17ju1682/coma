@@ -1,5 +1,3 @@
-from abc import abstractmethod, ABC, abs
-
 from random import Random
 
 import hashlib
@@ -7,68 +5,52 @@ import hashlib
 from PIL import Image
 
 
+from interfaces import ImageUtilsInterface
 
 
-class ImageUtilsInterface(ABC):
-    def __init__(self, static_salt: str):
-        self.static_salt = static_salt
-    
-    
-    @abstractmethod
-    def get_dynamic_salt(self, image_hash):
-        raise NotImplementedError
-    
-    
-    @staticmethod
-    @abstractmethod
-    def calculate_image_hash(image):
-        raise NotImplementedError
-    
-    
-    @staticmethod
-    @abstractmethod
-    def determined_random_pixel(size, dynamic_salt):
-        raise NotImplementedError
-    
-    
-    @staticmethod
-    @abstractmethod
-    def scaler(image: Image.Image, x_max=1920, y_max=1080) -> Image.Image:
-        raise NotImplementedError
-    
-    
-    @staticmethod
-    @abstractmethod
-    def generate_thumbnail(image: Image.Image) -> Image.Image:
-        raise NotImplementedError
-    
-    
-    @abstractmethod
-    def get_salted_image(self, image: Image.Image) -> Image:
-        raise NotImplementedError
-
-
-
-
-"""
-# best - is a 20x space benefit and the same quality
-img.save('hig.webp', method=6, quality=95)
-
-# medium - is a 40x space benefit and a little worse quality
-img.save('med.webp', method=6, quality=80)
-
-# medium, but still acceptible quality. 70x space-savings
-# most compact
-img.save('worst.webp', method=6, quality=60)
-"""
 class ImageUtils(ImageUtilsInterface):
-    def get_dynamic_salt(self, image_hash):
-        return hashlib.sha256(image_hash + self.static_salt.encode())
+    @staticmethod
+    def save_to_disk(content_dir, image_hash, image, thumbnail, *, mode="balance"):
+        """
+        args for mode:
+        
+        "quiality" - is a 20x space benefit and the same quality.
+        
+        "balance" - is a 40x space benefit and a little worse quality.
+        
+        "compact" - still acceptible quality. 70x space-savings.
+        """
+        if not mode in ('quiality', 'balance', 'compact'):
+            raise ValueError(f"Invalid mode: {mode}. Expected one of: 'quiality', 'balance', 'compact'")
+        
+        thumbnail_path = content_dir+"/thumbnails/"+f"thumbnail_{image_hash}.webp"
+        image_path = content_dir+"/"+f"{image_hash}.webp"
+        
+        thumbnail.save(thumbnail_path, method=6)
+        
+        if mode == "quiality":
+            image.save(image_path, method=6, quality=95)
+        elif mode == "balance":
+            image.save(image_path, method=6, quality=90)
+        elif mode == "compact":
+            image.save(image_path, method=6)
+    
+    
+    @staticmethod
+    def bytes_to_image(image_bytes):
+        return Image.open(image_bytes)
+
+    
+    def get_dynamic_salt(self, image_hash: str):
+        string = image_hash + self.static_salt
+        dynamic_salt = hashlib.sha256(string.encode())
+        return dynamic_salt.hexdigest()
     
     
     @staticmethod
     def calculate_image_hash(image):
-        return hashlib.sha256(image.tobytes())
+        hash = hashlib.sha256(image.tobytes())
+        return hash.hexdigest()
 
 
     @staticmethod
@@ -81,7 +63,7 @@ class ImageUtils(ImageUtilsInterface):
     
     
     @staticmethod
-    def scaler(image: Image.Image, x_max=1920, y_max=1080) -> Image.Image:
+    def scaler(image, x_max=1920, y_max=1080):
         width, height = image.size
             
         if width > height:
@@ -99,14 +81,14 @@ class ImageUtils(ImageUtilsInterface):
     
     
     @staticmethod
-    def generate_thumbnail(image: Image.Image) -> Image.Image:
+    def generate_thumbnail(image):
         size = 128, 128
         thmb = image.copy()
         thmb.thumbnail(size)
         return thmb
      
      
-    def get_salted_image(self, image: Image.Image) -> Image: 
+    def get_salted_image(self, image): 
         image_hash = self.calculate_image_hash(image)
         dynamic_salt = self.get_dynamic_salt(image_hash)
         
