@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     DB_NAME: str
     IMAGE_SALT: str
     CONTENT_DIR: str
+    DEFAULT_IMAGES_QUALITY: str
     
     
     @computed_field

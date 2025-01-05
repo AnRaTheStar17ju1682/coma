@@ -1,4 +1,4 @@
-from pydantic import BaseModel, StringConstraints, Field, constr
+from pydantic import BaseModel, Field, HttpUrl
 
 from fastapi import Form
 
@@ -19,9 +19,9 @@ class ImagePostDTO(BaseModel):
     description: Description_350 = None
     
     tags: Tags = ("untagged",)
-    meta: Tags = None
-    copyright: Tags = None
     characters: Tags = None
+    copyright: Tags = None
+    meta: Tags = None
     
     score: Annotated[Optional[int], Field(ge=0, le=10)] = None
-    source: Str_50 = None
+    source: Annotated[Optional[HttpUrl], Field(max_length=150)] = None

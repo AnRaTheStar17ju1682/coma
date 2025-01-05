@@ -11,7 +11,7 @@ from models_dto import AbstractDTO
 class RepoInterface(ABC):
     @staticmethod
     @abstractmethod
-    async def save_data(image_data: AbstractDTO):
+    async def add_one(image_data: AbstractDTO):
         raise NotImplementedError
 
 

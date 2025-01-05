@@ -10,7 +10,7 @@ from interfaces import ImageUtilsInterface
 
 class ImageUtils(ImageUtilsInterface):
     @staticmethod
-    def save_to_disk(content_dir, image_hash, image, thumbnail, *, mode="balance"):
+    def save_to_disk(content_dir, image_hash, image, thumbnail, *, mode):
         """
         args for mode:
         

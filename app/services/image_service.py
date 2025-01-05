@@ -11,6 +11,7 @@ from config import settings
 
 
 content_dir = settings.CONTENT_DIR
+quality = settings.DEFAULT_IMAGES_QUALITY
 
 
 class ImagesService():
@@ -28,5 +29,7 @@ class ImagesService():
         img = self.image_utils.get_salted_image(raw_img)
         img_hash = self.image_utils.calculate_image_hash(img)
         thumbnail = self.image_utils.generate_thumbnail(img)
-        await to_thread(self.image_utils.save_to_disk, content_dir, img_hash, img, thumbnail)
+        await to_thread(self.image_utils.save_to_disk, content_dir, img_hash, img, thumbnail, mode=quality)
+        
+        
         ...
