@@ -10,7 +10,7 @@ from typing import Optional, Annotated, Sequence
 import uvicorn
 
 
-from models_dto import ImagePostDTO, Str_50, Description_350, Tags
+from models_dto import ItemPostDTO, Str_50, Description_350, Tags
 
 from dependencies import image_post_dto_dependency
 
@@ -30,7 +30,7 @@ async def get_ico():
 @app.post("/images/", status_code=201)
 async def upload_image(
     image: Annotated[bytes, File()],
-    image_data: Annotated[ImagePostDTO, Depends(image_post_dto_dependency)]
+    image_data: Annotated[ItemPostDTO, Depends(image_post_dto_dependency)]
 ):
     async with async_open(file=f"./content/{image.filename}", mode="wb") as file:
        await file.write(await image.read())

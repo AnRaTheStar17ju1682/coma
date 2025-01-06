@@ -5,7 +5,7 @@ from asyncio import to_thread
 
 from interfaces import ImageUtilsInterface, RepoInterface
 
-from models_dto import ImagePostDTO
+from models_dto import ItemPostDTO
 
 from config import settings
 
@@ -24,7 +24,7 @@ class ImagesService():
         self.image_utils = image_utils
     
     
-    async def create_image(self, image_bytes: bytes, image_post_dto: ImagePostDTO) -> None:
+    async def create_image(self, image_bytes: bytes, item_post_dto: ItemPostDTO) -> None:
         raw_img = self.image_utils.bytes_to_image(image_bytes)
         img = self.image_utils.get_salted_image(raw_img)
         img_hash = self.image_utils.calculate_image_hash(img)
