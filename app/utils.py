@@ -4,6 +4,8 @@ import hashlib
 
 from PIL import Image
 
+from io import BytesIO
+
 
 from interfaces import ImageUtilsInterface
 
@@ -38,7 +40,7 @@ class ImageUtils(ImageUtilsInterface):
     
     @staticmethod
     def bytes_to_image(image_bytes):
-        return Image.open(image_bytes)
+        return Image.open(BytesIO(image_bytes))
 
     
     def get_dynamic_salt(self, image_hash: str):

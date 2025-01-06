@@ -12,7 +12,9 @@ import uvicorn
 
 from models_dto import ItemPostDTO, Str_50, Description_350, Tags
 
-from dependencies import image_post_dto_dependency
+from services.image_service import ImagesService
+
+from dependencies import image_post_dto_dependency, image_service_dependency
 
 
 
@@ -30,12 +32,11 @@ async def get_ico():
 @app.post("/images/", status_code=201)
 async def upload_image(
     image: Annotated[bytes, File()],
-    image_data: Annotated[ItemPostDTO, Depends(image_post_dto_dependency)]
+    image_data: Annotated[ItemPostDTO, Depends(image_post_dto_dependency)],
+    image_service: Annotated[ImagesService, Depends(image_service_dependency)]
 ):
-    async with async_open(file=f"./content/{image.filename}", mode="wb") as file:
-       await file.write(await image.read())
-    return image_data
-    # return {"ok": True}
+    await image_service.post_image(image, image_data)
+    return {"ok": True}
 
 
 @app.get("/iamges/{name}", status_code=200, response_class=FileResponse)

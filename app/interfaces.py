@@ -3,15 +3,15 @@ from abc import abstractmethod, ABC
 from PIL import Image
 
 
-from models_dto import AbstractDTO
+from models_dto import ItemPostDTO
 
 
 
 
-class RepoInterface(ABC):
+class RepositoryInterface(ABC):
     @staticmethod
     @abstractmethod
-    async def add_one(image_data: AbstractDTO):
+    async def add_one_item(item_dto: ItemPostDTO, item_hash: str):
         raise NotImplementedError
 
 

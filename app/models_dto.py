@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, HttpUrl, ConfigDict, field_validator
+from pydantic import BaseModel, Field, HttpUrl, ConfigDict, field_validator, computed_field
 
 from fastapi import Form
 
@@ -10,7 +10,7 @@ from models_orm import TagsORM
 
 Str_50 = Annotated[Optional[str], Field(max_length=50)]
 Description_350 = Annotated[Optional[str], Field(max_length=350)]
-Tags = Annotated[Optional[Sequence[Str_50]], Field(max_length=100)]
+Tags = Annotated[Optional[list[Str_50]], Field(max_length=100)]
 
 
 class AbstractDTO(BaseModel):
@@ -28,6 +28,16 @@ class ItemBaseDTO(BaseModel):
     
     score: Annotated[Optional[int], Field(ge=0, le=10)] = None
     source: Annotated[Optional[HttpUrl], Field(max_length=150)] = None
+    
+    @property
+    def alltags(self) -> set[str]:
+        all_tags = {*self.tags, *self.characters, *self.copyright, *self.meta}
+        return all_tags
+    
+    @field_validator("source", mode="after")
+    @classmethod
+    def http_to_string(cls, value: HttpUrl) -> list[str]:
+        return value.unicode_string()
 
 
 class ItemPostDTO(ItemBaseDTO):

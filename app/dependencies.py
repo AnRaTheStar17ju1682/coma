@@ -7,9 +7,11 @@ from pydantic import ValidationError
 
 from config import settings
 
-from models_dto import ImagePostDTO, Str_50, Description_350, Tags
+from models_dto import ItemPostDTO, Str_50, Description_350, Tags
 
 from utils import ImageUtils
+
+from database.repositories import SQLAlchemyRepository
 
 from services.image_service import ImagesService
 
@@ -28,9 +30,14 @@ async def image_post_dto_dependency(
     source: Annotated[Str_50, Form()] = None,
 ):
     
+    if not score:
+        score = None
+    if not source:
+        source = None
+    
     if json_dump:
         try:
-            return ImagePostDTO.model_validate_json(json_dump)
+            return ItemPostDTO.model_validate_json(json_dump)
         except ValidationError:
             raise HTTPException(status_code=422, detail="wrong json dict")
     else:
@@ -38,8 +45,8 @@ async def image_post_dto_dependency(
         meta = meta[0].split(",")
         copyright = copyright[0].split(",")
         characters = characters[0].split(",")
-        return ImagePostDTO(name=name, description=description, tags=tags, meta=meta, copyright=copyright, characters=characters, score=score, source=source)
+        return ItemPostDTO(name=name, description=description, tags=tags, meta=meta, copyright=copyright, characters=characters, score=score, source=source)
 
 
-async def image_service_dependency():
-    return ImagesService(images_repo=None, image_utils=ImageUtils(settings.IMAGE_SALT))
+async def image_service_dependency() -> ImagesService:
+    return ImagesService(repository=SQLAlchemyRepository(), image_utils=ImageUtils(settings.IMAGE_SALT))
