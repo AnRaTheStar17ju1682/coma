@@ -15,6 +15,7 @@ rel_kw_taglike = {
     "lazy": "selectin",
     "back_populates": "tag_items",
     "secondary": "items_tags",
+    "viewonly": True
 }
 
 

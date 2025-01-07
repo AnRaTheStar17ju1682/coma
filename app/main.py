@@ -1,6 +1,10 @@
 from fastapi import FastAPI, UploadFile, Form, File, Depends, Header, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
 
+from sqlalchemy.exc import IntegrityError
+
+from psycopg.errors import UniqueViolation
+
 from aiofiles import open as async_open
 
 from pydantic import BaseModel, StringConstraints, Field, ValidationError
@@ -34,11 +38,26 @@ async def upload_image(
     item: Annotated[ItemPostDTO, Form()],
     image_service: Annotated[ImagesService, Depends(image_service_dependency)]
 ):
-    await image_service.post_image(image=item)
+    try:
+        await image_service.post_image(image=item)
+    except IntegrityError as err:
+        if isinstance(err.orig, UniqueViolation):
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "msg": "Item with this hash already exists, change old post, instead of creating new",
+                    "item_hash": err.params["item_hash"]
+                }
+            )
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Database error"
+            )
     return {"ok": True}
 
 
-@app.get("/iamges/{name}", status_code=200, response_class=FileResponse)
+@app.get("/images/{name}", status_code=200, response_class=FileResponse)
 async def download_image(name: str):
     file_path = f"./content/{name}"
     return FileResponse(file_path, media_type="image/jpeg")
