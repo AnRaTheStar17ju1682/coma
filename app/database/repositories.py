@@ -22,20 +22,23 @@ class SQLAlchemyRepository(RepositoryInterface):
         async with session_factory() as session:
             item = ItemsORM(
                 item_hash=item_hash,
-               **item_dto.model_dump(exclude={"tags", "characters", "copyright", "meta"})
+               **item_dto.model_dump(exclude={"file", "tags", "characters", "copyright", "meta"})
             )
 
             query = select(TagsORM).where(TagsORM.tag_title.in_(item_dto.alltags))
-            result = (await session.execute(query)).scalars().all()
+            tag_records = (await session.execute(query)).scalars().all()
             
-            if new_tags := item_dto.alltags - {result[i].tag_title for i in range(len(result))}:
+            if new_tags := item_dto.alltags - {tag.tag_title for tag in tag_records}:
+                new_tag_records = [TagsORM(tag_title=tag, tag_type=get_tag_type(tag)) for tag in new_tags]
                 session.add_all(
-                    [TagsORM(tag_title=tag, tag_type=get_tag_type(tag)) for tag in new_tags]
+                    new_tag_records
                 )
             
             session.add(item)
             await session.flush()
-            tag_ids = (result[i].tag_id for i in range(len(result)))
+            
+            all_tag_records = tag_records + new_tag_records
+            tag_ids = (tag.tag_id for tag in all_tag_records)
             associations = (
                 ItemsTagsORM(item_id=item.item_id, tag_id=tag_id) for tag_id in tag_ids
             )
