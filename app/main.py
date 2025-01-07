@@ -14,7 +14,7 @@ from models_dto import ItemPostDTO, Str_50, Description_350, Tags
 
 from services.image_service import ImagesService
 
-from dependencies import image_post_dto_dependency, image_service_dependency
+from dependencies import image_service_dependency
 
 
 
@@ -31,11 +31,10 @@ async def get_ico():
 
 @app.post("/images/", status_code=201)
 async def upload_image(
-    image: Annotated[bytes, File()],
-    image_data: Annotated[ItemPostDTO, Depends(image_post_dto_dependency)],
+    item: Annotated[ItemPostDTO, Form()],
     image_service: Annotated[ImagesService, Depends(image_service_dependency)]
 ):
-    await image_service.post_image(image, image_data)
+    await image_service.post_image(image=item)
     return {"ok": True}
 
 

@@ -2,6 +2,8 @@ from abc import abstractmethod, ABC
 
 from PIL import Image
 
+from fastapi import UploadFile
+
 
 from models_dto import ItemPostDTO
 
@@ -34,7 +36,7 @@ class ImageUtilsInterface(ABC):
     
     @staticmethod
     @abstractmethod
-    def bytes_to_image(image_bytes: bytes) -> Image.Image:
+    def uploadfile_to_image(image_file: UploadFile) -> Image.Image:
         raise NotImplementedError
     
     

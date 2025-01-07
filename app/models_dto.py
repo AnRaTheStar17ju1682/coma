@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, HttpUrl, ConfigDict, field_validator, computed_field
 
-from fastapi import Form
+from fastapi import UploadFile
 
 from typing import Optional, Annotated, Sequence
 
@@ -41,7 +41,7 @@ class ItemBaseDTO(BaseModel):
 
 
 class ItemPostDTO(ItemBaseDTO):
-    pass
+    file: UploadFile
 
 
 class ItemFullDTO(ItemBaseDTO):
