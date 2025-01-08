@@ -5,7 +5,7 @@ from PIL import Image
 from fastapi import UploadFile
 
 
-from models_dto import ItemPostDTO
+from models_dto import ItemPostDTO, ItemAddToDB
 
 
 
@@ -13,7 +13,7 @@ from models_dto import ItemPostDTO
 class RepositoryInterface(ABC):
     @staticmethod
     @abstractmethod
-    async def add_one_item(item_dto: ItemPostDTO, item_hash: str):
+    async def add_one_item(item_dto: ItemAddToDB, item_hash: str):
         raise NotImplementedError
 
 

@@ -22,7 +22,7 @@ class SQLAlchemyRepository(RepositoryInterface):
         async with session_factory() as session:
             item = ItemsORM(
                 item_hash=item_hash,
-               **item_dto.model_dump(exclude={"file", "tags", "characters", "copyright", "meta"})
+               **item_dto.model_dump(exclude={"tags", "characters", "copyright", "meta"})
             )
 
             query = select(TagsORM).where(TagsORM.tag_title.in_(item_dto.alltags))

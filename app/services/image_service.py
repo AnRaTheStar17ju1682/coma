@@ -5,7 +5,7 @@ from asyncio import to_thread
 
 from interfaces import ImageUtilsInterface, RepositoryInterface
 
-from models_dto import ItemPostDTO
+from models_dto import ItemPostDTO, ItemAddToDB
 
 from config import settings
 
@@ -35,4 +35,5 @@ class ImagesService():
         thumbnail = self.image_utils.generate_thumbnail(img)
         await to_thread(self.image_utils.save_to_disk, content_dir, img_hash, img, thumbnail, mode=quality)
         
-        await self.repository.add_one_item(image, img_hash)
+        image_model_for_db = ItemAddToDB.model_validate(image.model_dump(exclude={"file"}, exclude_unset=True))
+        await self.repository.add_one_item(image_model_for_db, img_hash)

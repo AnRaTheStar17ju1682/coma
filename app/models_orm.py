@@ -1,15 +1,19 @@
-from sqlalchemy import ForeignKey, and_, Index
+from sqlalchemy import ForeignKey, and_, Index, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from typing import Annotated, Optional
 
 from enum import Enum
 
+from datetime import datetime
+
 
 from database.database import Base
 
 
 int_pk = Annotated[int, mapped_column(primary_key=True, autoincrement=True)]
+created_at = Annotated[datetime, mapped_column(server_default=func.now())]
+updated_at = Annotated[datetime, mapped_column(server_default=func.now(), onupdate=datetime.now)]
 rel_kw_taglike = {
     "primaryjoin": "ItemsORM.item_id == ItemsTagsORM.item_id",
     "lazy": "selectin",
@@ -55,6 +59,8 @@ class ItemsORM(Base):
     # new attrs compared PostDTO model
     item_id: Mapped[int_pk]
     item_hash: Mapped[str] = mapped_column(index=True, unique=True)
+    created_at: Mapped[created_at]
+    updated_at: Mapped[updated_at]
     
     __table_args__ = (
         Index("ix_score_not_null", "score", postgresql_where="score IS NOT NULL"),
