@@ -39,7 +39,7 @@ async def upload_image(
     image_service: Annotated[ImagesService, Depends(image_service_dependency)]
 ):
     try:
-        await image_service.post_image(image=item)
+        item_hash = await image_service.post_image(image=item)
     except IntegrityError as err:
         if isinstance(err.orig, UniqueViolation):
             raise HTTPException(
@@ -54,7 +54,7 @@ async def upload_image(
                 status_code=500,
                 detail="Database error"
             )
-    return {"ok": True}
+    return {"item_hash": item_hash}
 
 
 @app.get("/images/{name}", status_code=200, response_class=FileResponse)

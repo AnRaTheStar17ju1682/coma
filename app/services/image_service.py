@@ -29,11 +29,13 @@ class ImagesService():
     
     
     async def post_image(self, image: ItemPostDTO):
+        image_model_for_db = ItemAddToDB.model_validate(image.model_dump(exclude={"file"}, exclude_unset=True))
         raw_img = self.image_utils.uploadfile_to_image(image.file)
         img = self.image_utils.get_salted_image(raw_img)
         img_hash = self.image_utils.calculate_image_hash(img)
         thumbnail = self.image_utils.generate_thumbnail(img)
+        
+        await self.repository.add_one_item(image_model_for_db, img_hash)
         await to_thread(self.image_utils.save_to_disk, content_dir, img_hash, img, thumbnail, mode=quality)
         
-        image_model_for_db = ItemAddToDB.model_validate(image.model_dump(exclude={"file"}, exclude_unset=True))
-        await self.repository.add_one_item(image_model_for_db, img_hash)
+        return img_hash
