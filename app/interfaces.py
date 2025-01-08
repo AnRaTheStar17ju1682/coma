@@ -13,7 +13,13 @@ from models_dto import ItemPostDTO, ItemAddToDB
 class RepositoryInterface(ABC):
     @staticmethod
     @abstractmethod
-    async def add_one_item(item_dto: ItemAddToDB, item_hash: str):
+    async def add_one_item(item_dto: ItemAddToDB, item_hash: str) -> int:
+        raise NotImplementedError
+    
+    
+    @staticmethod
+    @abstractmethod
+    async def delete_one_item(item_hash: str) -> int:
         raise NotImplementedError
 
 
@@ -70,4 +76,16 @@ class ImageUtilsInterface(ABC):
     
     @abstractmethod
     def get_salted_image(self, image: Image.Image) -> Image.Image:
+        raise NotImplementedError
+    
+    
+    @staticmethod
+    @abstractmethod
+    def delete_image_from_disk(content_dir: str, image_hash: str) -> None:
+        raise NotImplementedError
+    
+    
+    @staticmethod
+    @abstractmethod
+    def delete_thumbnail_from_disk(content_dir: str, image_hash: str) -> None:
         raise NotImplementedError

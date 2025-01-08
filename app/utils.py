@@ -4,6 +4,10 @@ import hashlib
 
 from PIL import Image
 
+from os import remove
+
+from glob import glob
+
 
 from interfaces import ImageUtilsInterface
 
@@ -99,3 +103,17 @@ class ImageUtils(ImageUtilsInterface):
         image.putpixel(random_pixel_location, changed_pixel)
         
         return image
+    
+    
+    @staticmethod
+    def delete_image_from_disk(content_dir, image_hash):
+        image_path = content_dir+"/"+f"{image_hash}"
+        path_with_extension = glob(f"{image_path}.*")[0]
+        remove(path_with_extension)
+    
+    
+    @staticmethod
+    def delete_thumbnail_from_disk(content_dir, image_hash):
+        thumbnail_path = content_dir+"/thumbnails/"+f"thumbnail_{image_hash}"
+        path_with_extension = glob(f"{thumbnail_path}.*")[0]
+        remove(path_with_extension)
