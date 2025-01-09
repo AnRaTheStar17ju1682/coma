@@ -30,12 +30,13 @@ class ItemBaseDTO(BaseModel):
     copyright: Tags = []
     meta: Tags = []
     
+    score: Optional[int] = None
+    source: Optional[str] = None
+
+
+class ItemPutDTO(ItemBaseDTO):
     score: Annotated[Optional[int], Field(ge=0, le=10)] = None
     source: Annotated[Optional[HttpUrl], Field(max_length=150)] = None
-
-
-class ItemPostDTO(ItemBaseDTO):
-    file: UploadFile
     
     @field_validator("tags", "characters", "copyright", "meta", mode="after")
     @classmethod
@@ -56,6 +57,10 @@ class ItemPostDTO(ItemBaseDTO):
         return value.unicode_string()
 
 
+class ItemPostDTO(ItemPutDTO):
+    file: UploadFile
+
+
 class ItemAddToDB(ItemBaseDTO):
     @property
     def alltags(self) -> set[str]:
@@ -63,11 +68,21 @@ class ItemAddToDB(ItemBaseDTO):
         return all_tags
 
 
+class ItemUpdateInDB(ItemAddToDB):
+    created_at: Optional[datetime] = None
+    
+    @property
+    def alltags(self) -> set[str]:
+        all_tags = {*self.tags, *self.characters, *self.copyright, *self.meta}
+        return all_tags
+    
+
+
 class ItemFullDTO(ItemBaseDTO):
     item_id: int
     item_hash: str
     created_at: datetime
-    created_at: datetime
+    updated_at: datetime
     
     @field_validator("tags", "characters", "copyright", "meta", mode="before")
     @classmethod

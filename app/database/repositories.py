@@ -1,4 +1,4 @@
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, update
 # from sqlalchemy.orm import ...
 
 
@@ -52,19 +52,25 @@ class SQLAlchemyRepository(RepositoryInterface):
     
     
     @staticmethod
-    async def delete_one_item(item_hash):
+    async def delete_one_item(item_hash, *, for_update=False):
         async with session_factory() as session:
-            query = delete(ItemsORM).where(ItemsORM.item_hash == item_hash).returning(ItemsORM.item_id)
+            query = (delete(ItemsORM).
+                where(ItemsORM.item_hash == item_hash).
+                returning(ItemsORM))
             
             result = await session.execute(query)
-            deleted_item_id = result.scalar_one()
+            item = result.scalar_one()
+            deleted_item_id, creation_date = item.item_id, item.created_at
             await session.commit()
             
-            return deleted_item_id
+            if for_update:
+                return creation_date
+            else:
+                return deleted_item_id
     
     
     @staticmethod
-    async def get_item_data(item_hash: str) -> ItemGetDTO:
+    async def get_item_data(item_hash):
         async with session_factory() as session:
             query = select(ItemsORM).where(ItemsORM.item_hash == item_hash)
             
@@ -73,3 +79,14 @@ class SQLAlchemyRepository(RepositoryInterface):
             item_dto = ItemGetDTO.model_validate(item)
             
             return(item_dto)
+    
+    
+    @classmethod
+    async def update_item_data(cls, item_hash, item_data):
+        creation_date = await cls.delete_one_item(item_hash, for_update=True)
+        
+        item_data.created_at = creation_date
+        
+        updated_item_new_id = await cls.add_one_item(item_data, item_hash)
+        
+        return updated_item_new_id

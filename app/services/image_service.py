@@ -5,7 +5,7 @@ from asyncio import to_thread
 
 from interfaces import ImageUtilsInterface, RepositoryInterface
 
-from models_dto import ItemPostDTO, ItemAddToDB, ItemGetDTO
+from models_dto import ItemPostDTO, ItemAddToDB, ItemGetDTO, ItemPutDTO, ItemUpdateInDB 
 
 from config import settings
 
@@ -53,3 +53,11 @@ class ImagesService():
         image_data = await self.repository.get_item_data(image_hash)
         
         return image_data
+    
+    
+    async def update_image_data(self, image_hash: str, image_dto: ItemPutDTO):
+        image_dto_db = ItemUpdateInDB.model_validate(image_dto.model_dump())
+        
+        item_new_id = await self.repository.update_item_data(image_hash, image_dto_db)
+        
+        return item_new_id

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, Form, File, Depends, Header, HTTPException, BackgroundTasks, status
+from fastapi import FastAPI, UploadFile, Form, File, Depends, Header, HTTPException, BackgroundTasks, status, Body
 from fastapi.responses import FileResponse
 
 from sqlalchemy.exc import IntegrityError, NoResultFound
@@ -12,7 +12,7 @@ from typing import Optional, Annotated, Sequence
 import uvicorn
 
 
-from models_dto import ItemPostDTO, Str_50, Description_350, Tags
+from models_dto import ItemPostDTO, ItemPutDTO, Str_50, Description_350, Tags
 
 from services.image_service import ImagesService
 
@@ -52,7 +52,7 @@ async def upload_item(
                 status_code=500,
                 detail="Database error"
             )
-    return {"item_hash": item_hash, "created_item_id": item_id}
+    return {"created_item_hash": item_hash, "created_item_id": item_id}
 
 
 @app.delete("/items/{item_hash}", status_code=200)
@@ -63,7 +63,7 @@ async def delete_item(
     try:
         deleted_item_id = await image_service.delete_from_disk(image_hash=item_hash)
         
-        return {"succes": True, "deleted_item_hash": item_hash, "deleted_item_id": deleted_item_id}
+        return {"deleted_item_hash": item_hash, "deleted_item_id": deleted_item_id}
     except NoResultFound as err:
         raise HTTPException(
             status_code=404,
@@ -76,13 +76,33 @@ async def delete_item(
 
 @app.get("/items/{item_hash}", status_code=200)
 async def get_item_data(
-    item_hash,
+    item_hash: str,
     image_service: Annotated[ImagesService, Depends(image_service_dependency)]
 ):
     try:
         item_data = await image_service.get_image_data(image_hash=item_hash)
         
         return item_data
+    except NoResultFound as err:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "msg": "An Item with this hash does not exists",
+                "hash": item_hash
+            }
+        )
+
+
+@app.put("/items/{item_hash}", status_code=200)
+async def upadte_item_data(
+    item_hash: str,
+    item: Annotated[ItemPutDTO, Body()],
+    image_service: Annotated[ImagesService, Depends(image_service_dependency)]
+):
+    try:
+        updated_item_new_id = await image_service.update_image_data(item_hash, item)
+        
+        return {"updated_item_hash": item_hash, "updated_item_new_id": updated_item_new_id}
     except NoResultFound as err:
         raise HTTPException(
             status_code=404,

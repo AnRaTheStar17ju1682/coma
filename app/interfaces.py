@@ -5,7 +5,7 @@ from PIL import Image
 from fastapi import UploadFile
 
 
-from models_dto import ItemPostDTO, ItemAddToDB, ItemGetDTO
+from models_dto import ItemPostDTO, ItemAddToDB, ItemGetDTO, ItemPutDTO, ItemUpdateInDB
 
 
 
@@ -26,6 +26,12 @@ class RepositoryInterface(ABC):
     @staticmethod
     @abstractmethod
     async def get_item_data(item_hash: str) -> ItemGetDTO:
+        raise NotImplementedError
+    
+    
+    @classmethod
+    @abstractmethod
+    async def update_item_data(cls, item_hash: str, item_data: ItemUpdateInDB) -> int:
         raise NotImplementedError
 
 
