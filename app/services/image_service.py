@@ -5,7 +5,7 @@ from asyncio import to_thread
 
 from interfaces import ImageUtilsInterface, RepositoryInterface
 
-from models_dto import ItemPostDTO, ItemAddToDB
+from models_dto import ItemPostDTO, ItemAddToDB, ItemGetDTO
 
 from config import settings
 
@@ -47,3 +47,9 @@ class ImagesService():
         self.image_utils.delete_thumbnail_from_disk(content_dir, image_hash)
         
         return deleted_item_id
+    
+    
+    async def get_image_data(self, image_hash: str) -> ItemGetDTO:
+        image_data = await self.repository.get_item_data(image_hash)
+        
+        return image_data

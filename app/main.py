@@ -72,13 +72,25 @@ async def delete_item(
                 "hash": item_hash
             }
         )
+
+
+@app.get("/items/{item_hash}", status_code=200)
+async def get_item_data(
+    item_hash,
+    image_service: Annotated[ImagesService, Depends(image_service_dependency)]
+):
+    try:
+        item_data = await image_service.get_image_data(image_hash=item_hash)
         
-
-
-@app.get("/items/{item_hash}", status_code=200, response_class=FileResponse)
-async def download_item(item_hash: str):
-    file_path = f"./content/{item_hash}"
-    return FileResponse(file_path)# , media_type="image/jpeg")
+        return item_data
+    except NoResultFound as err:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "msg": "An Item with this hash does not exists",
+                "hash": item_hash
+            }
+        )
 
 
 

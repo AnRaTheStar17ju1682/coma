@@ -75,3 +75,7 @@ class ItemFullDTO(ItemBaseDTO):
         return [tag.tag_title for tag in value]
     
     model_config = ConfigDict(from_attributes=True)
+
+
+class ItemGetDTO(ItemFullDTO):
+    pass

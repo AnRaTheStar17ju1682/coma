@@ -8,6 +8,8 @@ from database.database import session_factory
 
 from models_orm import ItemsORM, TagsORM, ItemsTagsORM
 
+from models_dto import ItemGetDTO
+
 
 class SQLAlchemyRepository(RepositoryInterface):
     @staticmethod
@@ -59,3 +61,15 @@ class SQLAlchemyRepository(RepositoryInterface):
             await session.commit()
             
             return deleted_item_id
+    
+    
+    @staticmethod
+    async def get_item_data(item_hash: str) -> ItemGetDTO:
+        async with session_factory() as session:
+            query = select(ItemsORM).where(ItemsORM.item_hash == item_hash)
+            
+            result = await session.execute(query)
+            item = result.scalar_one()
+            item_dto = ItemGetDTO.model_validate(item)
+            
+            return(item_dto)
