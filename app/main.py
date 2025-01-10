@@ -31,7 +31,7 @@ async def get_ico():
     return FileResponse("favicon.ico", media_type="image/x-icon", headers={"Cache-Control": "max-age=1w"})
 
 
-@app.post("/items/", status_code=201)
+@app.post("/items/", status_code=201, tags=["item_endpoints"])
 async def upload_item(
     item: Annotated[ItemPostDTO, Form()],
     image_service: Annotated[ImagesService, Depends(image_service_dependency)]
@@ -55,7 +55,7 @@ async def upload_item(
     return {"created_item_hash": item_hash, "created_item_id": item_id}
 
 
-@app.delete("/items/{item_hash}", status_code=200)
+@app.delete("/items/{item_hash}", status_code=200, tags=["item_endpoints"])
 async def delete_item(
     item_hash: str,
     image_service: Annotated[ImagesService, Depends(image_service_dependency)]
@@ -74,7 +74,7 @@ async def delete_item(
         )
 
 
-@app.get("/items/{item_hash}", status_code=200)
+@app.get("/items/{item_hash}", status_code=200, tags=["item_endpoints"])
 async def get_item_data(
     item_hash: str,
     image_service: Annotated[ImagesService, Depends(image_service_dependency)]
@@ -93,7 +93,7 @@ async def get_item_data(
         )
 
 
-@app.put("/items/{item_hash}", status_code=200)
+@app.put("/items/{item_hash}", status_code=200, tags=["item_endpoints"])
 async def upadte_item_data(
     item_hash: str,
     item: Annotated[ItemPutDTO, Body()],
