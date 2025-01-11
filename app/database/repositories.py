@@ -4,22 +4,19 @@ from sqlalchemy import select, delete, update
 
 from interfaces import RepositoryInterface
 
-from database.database import session_factory
-
 from models_orm import ItemsORM, TagsORM, ItemsTagsORM
 
 from models_dto import ItemGetDTO
 
 
 class SQLAlchemyRepository(RepositoryInterface):
-    @staticmethod
-    async def add_one_item(item_dto, item_hash):
+    async def add_one_item(self, item_dto, item_hash):
         def get_tag_type(tag):
             for tag_type in ("tags", "characters", "copyright", "meta"):
                 if tag in getattr(item_dto, tag_type):
                     return tag_type
         
-        async with session_factory() as session:
+        async with self.session_fabric() as session:
             item = ItemsORM(
                 item_hash=item_hash,
                **item_dto.model_dump(exclude={"tags", "characters", "copyright", "meta"})
@@ -51,9 +48,8 @@ class SQLAlchemyRepository(RepositoryInterface):
             return item_id
     
     
-    @staticmethod
-    async def delete_one_item(item_hash, *, for_update=False):
-        async with session_factory() as session:
+    async def delete_one_item(self, item_hash, *, for_update=False):
+        async with self.session_fabric() as session:
             query = (delete(ItemsORM).
                 where(ItemsORM.item_hash == item_hash).
                 returning(ItemsORM))
@@ -69,9 +65,8 @@ class SQLAlchemyRepository(RepositoryInterface):
                 return deleted_item_id
     
     
-    @staticmethod
-    async def get_item_data(item_hash):
-        async with session_factory() as session:
+    async def get_item_data(self, item_hash):
+        async with self.session_fabric() as session:
             query = select(ItemsORM).where(ItemsORM.item_hash == item_hash)
             
             result = await session.execute(query)
@@ -81,12 +76,11 @@ class SQLAlchemyRepository(RepositoryInterface):
             return(item_dto)
     
     
-    @classmethod
-    async def update_item_data(cls, item_hash, item_data):
-        creation_date = await cls.delete_one_item(item_hash, for_update=True)
+    async def update_item_data(self,  item_hash, item_data):
+        creation_date = await self.delete_one_item(item_hash, for_update=True)
         
         item_data.created_at = creation_date
         
-        updated_item_new_id = await cls.add_one_item(item_data, item_hash)
+        updated_item_new_id = await self.add_one_item(item_data, item_hash)
         
         return updated_item_new_id

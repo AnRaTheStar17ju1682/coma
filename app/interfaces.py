@@ -4,40 +4,51 @@ from PIL import Image
 
 from fastapi import UploadFile
 
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+
 
 from models_dto import ItemPostDTO, ItemAddToDB, ItemGetDTO, ItemPutDTO, ItemUpdateInDB
 
-
+from models_orm import Base
 
 
 class RepositoryInterface(ABC):
-    @staticmethod
+    def __init__(self, engine: AsyncEngine, session_fabric: AsyncSession):
+        self.engine = engine
+        self.session_fabric = session_fabric
+        super().__init__()
+    
+    
+    async def create_tables(self):
+        async with self.engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
+            await conn.run_sync(Base.metadata.create_all)
+    
+    
     @abstractmethod
-    async def add_one_item(item_dto: ItemAddToDB, item_hash: str) -> int:
+    async def add_one_item(self, item_dto: ItemAddToDB, item_hash: str) -> int:
         raise NotImplementedError
     
     
-    @staticmethod
     @abstractmethod
-    async def delete_one_item(item_hash: str) -> int:
+    async def delete_one_item(self, item_hash: str) -> int:
         raise NotImplementedError
     
     
-    @staticmethod
     @abstractmethod
-    async def get_item_data(item_hash: str) -> ItemGetDTO:
+    async def get_item_data(self, item_hash: str) -> ItemGetDTO:
         raise NotImplementedError
     
     
-    @classmethod
     @abstractmethod
-    async def update_item_data(cls, item_hash: str, item_data: ItemUpdateInDB) -> int:
+    async def update_item_data(self, item_hash: str, item_data: ItemUpdateInDB) -> int:
         raise NotImplementedError
 
 
 class ImageUtilsInterface(ABC):
     def __init__(self, static_salt: str):
         self.static_salt = static_salt
+        super().__init__()
     
     
     @abstractmethod

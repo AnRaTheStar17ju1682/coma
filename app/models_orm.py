@@ -1,14 +1,11 @@
 from sqlalchemy import ForeignKey, and_, Index, func
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 
 from typing import Annotated, Optional
 
 from enum import Enum
 
 from datetime import datetime
-
-
-from database.database import Base
 
 
 int_pk = Annotated[int, mapped_column(primary_key=True, autoincrement=True)]
@@ -21,6 +18,10 @@ rel_kw_taglike = {
     "secondary": "items_tags",
     "viewonly": True
 }
+
+
+class Base(DeclarativeBase):
+    pass
 
 
 class TagType(Enum):

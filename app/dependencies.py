@@ -1,20 +1,26 @@
-from fastapi import Form, HTTPException
+from typing import Annotated
 
-from typing import Optional, Annotated
-
-from pydantic import ValidationError
+from fastapi import Depends
 
 
 from config import settings
-
-from models_dto import ItemPostDTO, Str_50, Description_350, Tags
 
 from utils import ImageUtils
 
 from database.repositories import SQLAlchemyRepository
 
+from database.database import engine, session_fabric
+
+from interfaces import RepositoryInterface
+
 from services.image_service import ImagesService
 
 
-async def image_service_dependency() -> ImagesService:
-    return ImagesService(repository=SQLAlchemyRepository(), image_utils=ImageUtils(settings.IMAGE_SALT))
+async def repository_dependency() -> RepositoryInterface:
+    return SQLAlchemyRepository(engine, session_fabric)
+
+
+async def image_service_dependency(
+    repository: Annotated[RepositoryInterface, Depends(repository_dependency)]
+) -> ImagesService:
+    return ImagesService(repository, image_utils=ImageUtils(settings.IMAGE_SALT))
