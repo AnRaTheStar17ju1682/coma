@@ -16,7 +16,7 @@ from models_orm import TagsORM
 
 Str_50 = Annotated[Optional[str], Field(max_length=50)]
 Description_350 = Annotated[Optional[str], Field(max_length=350)]
-Tags = Annotated[Optional[list[Str_50]], Field(max_length=100)]
+Tags = Annotated[list[Str_50], Field(max_length=100)]
 
 
 class ItemBaseDTO(BaseModel):
@@ -68,12 +68,6 @@ class ItemAddToDB(ItemBaseDTO):
 
 class ItemUpdateInDB(ItemAddToDB):
     created_at: Optional[datetime] = None
-    
-    @property
-    def alltags(self) -> set[str]:
-        all_tags = {*self.tags, *self.characters, *self.copyright, *self.meta}
-        return all_tags
-    
 
 
 class ItemFullDTO(ItemBaseDTO):
