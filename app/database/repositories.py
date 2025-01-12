@@ -1,4 +1,4 @@
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, delete, update, and_, func, not_, cast, Integer, Boolean
 # from sqlalchemy.orm import ...
 
 
@@ -50,9 +50,10 @@ class SQLAlchemyRepository(RepositoryInterface):
     
     async def delete_one_item(self, item_hash, *, for_update=False):
         async with self.session_fabric() as session:
-            query = (delete(ItemsORM).
-                where(ItemsORM.item_hash == item_hash).
-                returning(ItemsORM))
+            query = (
+                delete(ItemsORM)
+                .where(ItemsORM.item_hash == item_hash)
+                .returning(ItemsORM))
             
             result = await session.execute(query)
             item = result.scalar_one()
@@ -84,3 +85,64 @@ class SQLAlchemyRepository(RepositoryInterface):
         updated_item_new_id = await self.add_one_item(item_data, item_hash)
         
         return updated_item_new_id
+    
+    
+    
+    
+    def _build_tag_search_query(self, search_params):
+        included = search_params.include_tags
+        excluded = search_params.exclude_tags
+        order_by = search_params.order_by.value
+        conditions = list()
+        
+        query = select(ItemsORM.item_hash)
+        
+        if included or excluded:
+            for include_tag in included:
+                condition = func.sum(cast(TagsORM.tag_title == include_tag, Integer)) == 1
+                conditions.append(condition)
+            
+            for exclude_tag in excluded:
+                condition = func.sum(cast(TagsORM.tag_title == exclude_tag, Integer)) == 0
+                conditions.append(condition)
+            
+            if excluded and not included:
+                query = query.join_from(ItemsTagsORM, TagsORM, ItemsTagsORM.tag_id == TagsORM.tag_id)
+            elif included and excluded or included:
+                query = (query
+                    .join_from(
+                        ItemsTagsORM,
+                        TagsORM,
+                        and_(
+                            ItemsTagsORM.tag_id == TagsORM.tag_id,
+                            TagsORM.tag_title.in_(included+excluded),
+                        )
+                    )
+                )
+            query = (
+                query.group_by(ItemsTagsORM.item_id, ItemsORM.item_hash, ItemsORM.score, ItemsORM.created_at)
+                .having(and_(*conditions))
+                .join(ItemsORM, ItemsTagsORM.item_id == ItemsORM.item_id)
+            )
+        else:
+            query = query.distinct()
+        
+        query = query.limit(search_params.limit).offset(search_params.offset)
+        
+        if order_by == "score_asc":
+            query = query.order_by(ItemsORM.score.asc())
+        elif order_by == "score_desc":
+            query = query.order_by(ItemsORM.score.desc())
+        elif order_by == "post_date_asc":
+            query = query.order_by(ItemsORM.created_at.asc())
+        # order_by == "post_date_desc"
+        else:
+            query = query.order_by(ItemsORM.created_at.desc())
+        
+        return query
+    
+    
+    async def make_tag_search(self, query) -> list:
+        async with self.session_fabric() as session:
+            res = await session.execute(query)
+            return res.scalars().all()

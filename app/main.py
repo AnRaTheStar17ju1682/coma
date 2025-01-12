@@ -12,11 +12,12 @@ from typing import Optional, Annotated, Sequence
 import uvicorn
 
 
-from models_dto import ItemPostDTO, ItemPutDTO, Str_50, Description_350, Tags
+from models_dto import ItemPostDTO, ItemPutDTO, Str_50, Description_350, Tags, ItemSearchParamsDTO
 
 from services.image_service import ImagesService
+from services.search_service import SearchService
 
-from dependencies import image_service_dependency
+from dependencies import image_service_dependency, search_service_dependency
 
 
 
@@ -111,6 +112,15 @@ async def upadte_item_data(
                 "hash": item_hash
             }
         )
+
+
+@app.post("/tag_search/", tags=["search"])
+async def tag_search(
+    search_params: ItemSearchParamsDTO,
+    search_service: Annotated[SearchService, Depends(search_service_dependency)]
+) -> list[str]:
+    item_hashes = await search_service.search_by_tags(search_params)
+    return item_hashes
 
 
 

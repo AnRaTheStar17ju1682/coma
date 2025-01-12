@@ -9,8 +9,8 @@ from datetime import datetime
 
 
 int_pk = Annotated[int, mapped_column(primary_key=True, autoincrement=True)]
-created_at = Annotated[datetime, mapped_column(server_default=func.now())]
-updated_at = Annotated[datetime, mapped_column(server_default=func.now(), onupdate=datetime.now)]
+created_at = Annotated[datetime, mapped_column(server_default=func.now(), index=True)]
+updated_at = Annotated[datetime, mapped_column(server_default=func.now(), onupdate=datetime.now, index=True)]
 rel_kw_taglike = {
     "primaryjoin": "ItemsORM.item_id == ItemsTagsORM.item_id",
     "lazy": "selectin",

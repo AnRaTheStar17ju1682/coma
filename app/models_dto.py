@@ -8,6 +8,8 @@ from datetime import datetime
 
 import re
 
+from enum import Enum
+
 
 from models_orm import TagsORM
 
@@ -15,10 +17,6 @@ from models_orm import TagsORM
 Str_50 = Annotated[Optional[str], Field(max_length=50)]
 Description_350 = Annotated[Optional[str], Field(max_length=350)]
 Tags = Annotated[Optional[list[Str_50]], Field(max_length=100)]
-
-
-class AbstractDTO(BaseModel):
-    ...
 
 
 class ItemBaseDTO(BaseModel):
@@ -94,3 +92,20 @@ class ItemFullDTO(ItemBaseDTO):
 
 class ItemGetDTO(ItemFullDTO):
     pass
+
+
+
+
+class OrderBy(Enum):
+    score_asc = "score_asc"
+    score_desc = "score_desc"
+    post_date_asc = "post_date_asc"
+    post_date_desc = "post_date_desc"
+
+
+class ItemSearchParamsDTO(BaseModel):
+    order_by: OrderBy
+    include_tags: list[Str_50] = []
+    exclude_tags: list[Str_50] = []
+    offset: int = 0
+    limit: int = Field(ge=1, le=20)

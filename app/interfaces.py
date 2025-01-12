@@ -1,19 +1,21 @@
 from abc import abstractmethod, ABC
 
+from sqlalchemy.sql import Select
+
 from PIL import Image
 
 from fastapi import UploadFile
 
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, AsyncSession
 
 
-from models_dto import ItemPostDTO, ItemAddToDB, ItemGetDTO, ItemPutDTO, ItemUpdateInDB
+from models_dto import ItemPostDTO, ItemAddToDB, ItemGetDTO, ItemPutDTO, ItemUpdateInDB, ItemSearchParamsDTO
 
 from models_orm import Base
 
 
 class RepositoryInterface(ABC):
-    def __init__(self, engine: AsyncEngine, session_fabric: AsyncSession):
+    def __init__(self, engine: AsyncEngine, session_fabric: async_sessionmaker[AsyncSession]):
         self.engine = engine
         self.session_fabric = session_fabric
         super().__init__()
@@ -42,6 +44,18 @@ class RepositoryInterface(ABC):
     
     @abstractmethod
     async def update_item_data(self, item_hash: str, item_data: ItemUpdateInDB) -> int:
+        raise NotImplementedError
+    
+    
+    
+    
+    @abstractmethod
+    def _build_tag_search_query(self, search_params: ItemSearchParamsDTO) -> Select:
+        raise NotImplementedError
+    
+    
+    @abstractmethod
+    async def make_tag_search(self, query: Select) -> list:
         raise NotImplementedError
 
 
@@ -84,6 +98,7 @@ class ImageUtilsInterface(ABC):
     @abstractmethod
     def determined_random_pixel(size: tuple[int, int], dynamic_salt: str) -> tuple[int, int]:
         raise NotImplementedError
+    
     
     @staticmethod
     @abstractmethod
