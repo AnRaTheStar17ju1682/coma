@@ -35,10 +35,11 @@ async def get_ico():
 @app.post("/items/", status_code=201, tags=["item_endpoints"])
 async def upload_item(
     item: Annotated[ItemPostDTO, Form()],
-    image_service: Annotated[ImagesService, Depends(image_service_dependency)]
+    image_service: Annotated[ImagesService, Depends(image_service_dependency)],
+    background_tasks: BackgroundTasks
 ):
     try:
-        item_hash, item_id = await image_service.post_image(image=item)
+        item_hash, item_id = await image_service.post_image(image=item, background_tasks=background_tasks)
     except IntegrityError as err:
         if isinstance(err.orig, UniqueViolation):
             raise HTTPException(
