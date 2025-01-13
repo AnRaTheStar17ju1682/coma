@@ -1,4 +1,4 @@
-from sqlalchemy import select, delete, update, and_, func, not_, cast, Integer, Boolean
+from sqlalchemy import select, delete, update, and_, func, not_, cast, Integer, Boolean, insert
 # from sqlalchemy.orm import ...
 
 
@@ -10,42 +10,67 @@ from models_dto import ItemGetDTO
 
 
 class SQLAlchemyRepository(RepositoryInterface):
-    async def add_one_item(self, item_dto, item_hash):
-        def get_tag_type(tag):
+    async def add_items(self, *args):
+        def get_tag_type(tag, item_dto):
             for tag_type in ("tags", "characters", "copyright", "meta"):
                 if tag in getattr(item_dto, tag_type):
                     return tag_type
+    
+        
+        async def add_tags_if_not_exists(tags_and_types) -> list[TagsORM]:
+            alltags = set(tag for tag, _ in tags_and_types)
+            query = select(TagsORM).where(TagsORM.tag_title.in_(alltags))
+            exists_tag_records = (await session.execute(query)).scalars().all()
+
+            new_tag_records = list()
+            if new_tags := alltags - {tag.tag_title for tag in exists_tag_records}:
+                new_tag_records.extend([
+                    TagsORM(tag_title=tag, tag_type=type)
+                    for tag, type in tags_and_types
+                    if tag in new_tags
+                ])
+                session.add_all(new_tag_records)
+            
+            return exists_tag_records + new_tag_records
+        
         
         async with self.session_fabric() as session:
-            item = ItemsORM(
-                item_hash=item_hash,
-               **item_dto.model_dump(exclude={"tags", "characters", "copyright", "meta"})
-            )
-
-            query = select(TagsORM).where(TagsORM.tag_title.in_(item_dto.alltags))
-            tag_records = (await session.execute(query)).scalars().all()
+            tags_and_types = set()
+            for item_dto, _ in args:
+                for tag in item_dto.alltags:
+                    tag_and_type = (tag, get_tag_type(tag, item_dto))
+                    tags_and_types.add(tag_and_type)
             
-            if new_tags := item_dto.alltags - {tag.tag_title for tag in tag_records}:
-                new_tag_records = [TagsORM(tag_title=tag, tag_type=get_tag_type(tag)) for tag in new_tags]
-                session.add_all(
-                    new_tag_records
+            items = list()
+            for item_dto, item_hash in args:
+                item = ItemsORM(
+                    item_hash=item_hash,
+                **item_dto.model_dump(exclude={"tags", "characters", "copyright", "meta"})
                 )
-            else:
-                new_tag_records = list()
+                items.append((item, item_dto))
             
-            session.add(item)
+            tag_records = await add_tags_if_not_exists(tags_and_types)
+            session.add_all(item[0] for item in items)
             await session.flush()
             
-            item_id = item.item_id
-            all_tag_records = tag_records + new_tag_records
-            tag_ids = (tag.tag_id for tag in all_tag_records)
-            associations = (
-                ItemsTagsORM(item_id=item_id, tag_id=tag_id) for tag_id in tag_ids
-            )
+            id_by_title = {tag.tag_title: tag.tag_id for tag in tag_records}
+            
+            item_ids = list()
+            associations = list()
+            for item, item_dto in items:
+                associations.extend([
+                    ItemsTagsORM(item_id=item.item_id, tag_id=id_by_title[title]) for title in item_dto.alltags
+                ])
+                item_ids.append(item.item_id)
+            
             session.add_all(associations)
             await session.commit()
             
-            return item_id
+            return item_ids
+    
+    
+    async def add_one_item(self, item_dto, item_hash):
+        return await self.add_items((item_dto, item_hash))
     
     
     async def delete_one_item(self, item_hash, *, for_update=False):

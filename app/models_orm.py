@@ -76,8 +76,7 @@ class TagsORM(Base):
     tag_type: Mapped[TagType] = mapped_column(index=True)
     
     tag_items: Mapped[list["ItemsORM"]] = relationship(
-        secondary="items_tags",
-        lazy="selectin",
+        secondary="items_tags"
     )
 
 

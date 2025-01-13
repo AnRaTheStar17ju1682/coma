@@ -14,6 +14,9 @@ from models_dto import ItemPostDTO, ItemAddToDB, ItemGetDTO, ItemPutDTO, ItemUpd
 from models_orm import Base
 
 
+type ItemHashStr = str
+
+
 class RepositoryInterface(ABC):
     def __init__(self, engine: AsyncEngine, session_fabric: async_sessionmaker[AsyncSession]):
         self.engine = engine
@@ -25,6 +28,11 @@ class RepositoryInterface(ABC):
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
+    
+    
+    @abstractmethod
+    async def add_items(self, *args: tuple[ItemAddToDB, ItemHashStr]) -> list[int]:
+        raise NotImplementedError
     
     
     @abstractmethod
