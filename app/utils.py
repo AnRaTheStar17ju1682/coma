@@ -45,7 +45,7 @@ class ImageUtils(ImageUtilsInterface):
             quality = settings.DEFAULT_IMAGES_QUALITY
             
         image.save(image_path, method=6, quality=quality)
-        thumbnail.save(thumbnail_path, method=6)
+        thumbnail.save(thumbnail_path, method=6, quality=100)
     
     
     @staticmethod

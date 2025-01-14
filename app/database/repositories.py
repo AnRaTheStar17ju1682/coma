@@ -1,6 +1,8 @@
 from sqlalchemy import select, delete, update, and_, func, not_, cast, Integer, Boolean, insert
 # from sqlalchemy.orm import ...
 
+from sqlalchemy.exc import NoResultFound
+
 
 from interfaces import RepositoryInterface
 
@@ -27,8 +29,8 @@ class SQLAlchemyRepository(RepositoryInterface):
             new_tag_records = list()
             if new_tags := alltags - {tag.tag_title for tag in exists_tag_records}:
                 new_tag_records.extend([
-                    TagsORM(tag_title=tag, tag_type=type)
-                    for tag, type in tags_and_types
+                    TagsORM(tag_title=tag, tag_type=tag_type)
+                    for tag, tag_type in tags_and_types
                     if tag in new_tags
                 ])
                 session.add_all(new_tag_records)
@@ -75,22 +77,36 @@ class SQLAlchemyRepository(RepositoryInterface):
         return await self.add_items((item_dto, item_hash))
     
     
-    async def delete_one_item(self, item_hash, *, for_update=False):
+    async def delete_items(self, item_hashes):
         async with self.session_fabric() as session:
             query = (
                 delete(ItemsORM)
-                .where(ItemsORM.item_hash == item_hash)
+                .where(ItemsORM.item_hash.in_(item_hashes))
                 .returning(ItemsORM))
             
+            ids_and_creation_dates = list()
             result = await session.execute(query)
-            item = result.scalar_one()
-            deleted_item_id, creation_date = item.item_id, item.created_at
+            records = result.scalars().all()
+            
+            for item in records:
+                ids_and_creation_dates.append((item.item_id, item.created_at))
             await session.commit()
             
-            if for_update:
-                return creation_date
-            else:
-                return deleted_item_id
+            return ids_and_creation_dates
+    
+    
+    async def delete_one_item(self, item_hash, *, for_update=False):
+        record = await self.delete_items((item_hash,))
+        
+        if record:
+            deleted_item_id, creation_date = record[0]
+        else:
+            raise NoResultFound
+            
+        if for_update:
+            return creation_date
+        else:
+            return deleted_item_id
     
     
     async def get_item_data(self, item_hash):

@@ -8,6 +8,10 @@ from fastapi import UploadFile
 
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, AsyncSession
 
+from typing import Sequence
+
+from datetime import datetime
+
 
 from models_dto import ItemPostDTO, ItemAddToDB, ItemGetDTO, ItemPutDTO, ItemUpdateInDB, ItemSearchParamsDTO, FileSavingParamsDTO
 
@@ -37,6 +41,11 @@ class RepositoryInterface(ABC):
     
     @abstractmethod
     async def add_one_item(self, item_dto: ItemAddToDB, item_hash: str) -> int:
+        raise NotImplementedError
+    
+    
+    @abstractmethod
+    async def delete_items(self, item_hashes: Sequence[str]) -> list[tuple[int, datetime]]:
         raise NotImplementedError
     
     
