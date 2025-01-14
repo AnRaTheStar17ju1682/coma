@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, Form, File, Depends, Header, HTTPException, BackgroundTasks, status, Body
+from fastapi import FastAPI, UploadFile, Form, Query, Depends, Header, HTTPException, BackgroundTasks, status, Body
 from fastapi.responses import FileResponse
 
 from sqlalchemy.exc import IntegrityError, NoResultFound
@@ -12,7 +12,7 @@ from typing import Optional, Annotated, Sequence
 import uvicorn
 
 
-from models_dto import ItemPostDTO, ItemPutDTO, Str_50, Description_350, Tags, ItemSearchParamsDTO
+from models_dto import ItemPostDTO, ItemPutDTO, Str_50, Description_350, Tags, ItemSearchParamsDTO, FileSavingParamsDTO
 
 from services.image_service import ImagesService
 from services.search_service import SearchService
@@ -36,10 +36,11 @@ async def get_ico():
 async def upload_item(
     item: Annotated[ItemPostDTO, Form()],
     image_service: Annotated[ImagesService, Depends(image_service_dependency)],
-    background_tasks: BackgroundTasks
+    background_tasks: BackgroundTasks,
+    save_mode: Annotated[FileSavingParamsDTO, Depends()]
 ):
     try:
-        item_hash, item_id = await image_service.post_image(image=item, background_tasks=background_tasks)
+        item_hash, item_id = await image_service.post_image(item, background_tasks, save_mode)
     except IntegrityError as err:
         if isinstance(err.orig, UniqueViolation):
             raise HTTPException(

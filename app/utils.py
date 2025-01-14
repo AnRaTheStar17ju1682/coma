@@ -11,33 +11,41 @@ from glob import glob
 
 from interfaces import ImageUtilsInterface
 
+from config import settings
+
 
 class ImageUtils(ImageUtilsInterface):
-    @staticmethod
-    def save_to_disk(content_dir, image_hash, image, thumbnail, *, mode):
-        """
-        args for mode:
-        
-        "quiality" - is a 20x space benefit and the same quality.
-        
-        "balance" - is a 40x space benefit and a little worse quality.
-        
-        "compact" - still acceptible quality. 70x space-savings.
-        """
-        if not mode in ('quiality', 'balance', 'compact'):
-            raise ValueError(f"Invalid mode: {mode}. Expected one of: 'quiality', 'balance', 'compact'")
-        
+    def save_to_disk(self, content_dir, image_hash, image, thumbnail, *, mode):
         thumbnail_path = content_dir+"/thumbnails/"+f"thumbnail_{image_hash}.webp"
         image_path = content_dir+"/"+f"{image_hash}.webp"
         
-        thumbnail.save(thumbnail_path, method=6)
+        if resize_type := mode.resize or settings.DEFAULT_RESIZE_RESOLUTION:
+            if resize_type == "hd":
+                new_size = (1280, 720)
+            elif resize_type == "fullhd":
+                new_size = (1920, 1080)
+            elif resize_type == "qhd":
+                new_size = (2560, 1440)
+            elif resize_type == "uhd":
+                new_size = (3840, 2160)
+            elif settings.DEFAULT_RESIZE_RESOLUTION:
+                new_size = settings.DEFAULT_RESIZE_RESOLUTION
+            
+            image = self.scaler(image, *new_size)
         
-        if mode == "quiality":
-            image.save(image_path, method=6, quality=95)
-        elif mode == "balance":
-            image.save(image_path, method=6, quality=90)
-        elif mode == "compact":
-            image.save(image_path, method=6)
+        
+        if quality_type := mode.compress:
+            if quality_type == "quiality":
+                quality = 85
+            elif quality_type == "balance":
+                quality = 75
+            elif quality_type == "compact":
+                quality = 65
+        else:
+            quality = settings.DEFAULT_IMAGES_QUALITY
+            
+        image.save(image_path, method=6, quality=quality)
+        thumbnail.save(thumbnail_path, method=6)
     
     
     @staticmethod

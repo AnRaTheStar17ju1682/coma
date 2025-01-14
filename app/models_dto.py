@@ -59,6 +59,28 @@ class ItemPostDTO(ItemPutDTO):
     file: UploadFile
 
 
+class FileSavingParamsDTO(BaseModel):
+    class Compress(Enum):
+        """
+        "quiality" - is a 20x space benefit and the same quality.
+        
+        "balance" - is a 40x space benefit and a little worse quality.
+        
+        "compact" - still acceptible quality. 70x space-savings.
+        """
+        quality = "quiality"
+        balance = "balance"
+        comapct = "compact"
+    class Resize(Enum):
+        hd = "hd"
+        fullhd = "fullhd"
+        qhd = "qhd"
+        uhd = "uhd"
+    
+    compress: Optional[Compress] = None
+    resize: Optional[Resize] = None
+
+
 class ItemAddToDB(ItemBaseDTO):
     @property
     def alltags(self) -> set[str]:

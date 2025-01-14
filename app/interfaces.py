@@ -9,7 +9,7 @@ from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, AsyncSession
 
 
-from models_dto import ItemPostDTO, ItemAddToDB, ItemGetDTO, ItemPutDTO, ItemUpdateInDB, ItemSearchParamsDTO
+from models_dto import ItemPostDTO, ItemAddToDB, ItemGetDTO, ItemPutDTO, ItemUpdateInDB, ItemSearchParamsDTO, FileSavingParamsDTO
 
 from models_orm import Base
 
@@ -75,12 +75,13 @@ class ImageUtilsInterface(ABC):
     
     @abstractmethod
     def save_to_disk(
+        self,
         content_dir: str, 
         image_hash: str,
         image: Image.Image,
         thumbnail: Image.Image,
         *,
-        mode: str
+        mode: FileSavingParamsDTO
     ) -> None:
         raise NotImplementedError
     
