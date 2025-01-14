@@ -17,6 +17,8 @@ class SQLAlchemyRepository(RepositoryInterface):
                     return tag_type
     
         
+        # NOT IN ЮЗАЙ
+        # set(dict(tags_and_types))
         async def add_tags_if_not_exists(tags_and_types) -> list[TagsORM]:
             alltags = set(tag for tag, _ in tags_and_types)
             query = select(TagsORM).where(TagsORM.tag_title.in_(alltags))

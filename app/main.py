@@ -124,6 +124,18 @@ async def tag_search(
     return item_hashes
 
 
+@app.get("/download_item/{item_hash}", status_code=200, response_class=FileResponse, tags=["download"])
+async def download_item(item_hash: str):
+    file_path = f"./content/{item_hash}.webp"
+    return FileResponse(file_path, media_type="image/webp")
+
+
+@app.get("/download_thumbnail/{item_hash}", status_code=200, response_class=FileResponse, tags=["download"])
+async def download_item(item_hash: str):
+    file_path = f"./content/thumbnails/thumbnail_{item_hash}.webp"
+    return FileResponse(file_path, media_type="image/webp")
+
+
 
 
 if __name__ == "__main__":
