@@ -27,7 +27,7 @@ app = FastAPI(title="Coma-api")
 
 
 
-@app.get("/favicon.ico", status_code=200, response_class=FileResponse)
+@app.get("/favicon.ico", status_code=200, response_class=FileResponse, tags=["ico"])
 async def get_ico():
     return FileResponse("favicon.ico", media_type="image/x-icon", headers={"Cache-Control": "max-age=1w"})
 

@@ -167,15 +167,13 @@ class SQLAlchemyRepository(RepositoryInterface):
                 .having(and_(*conditions))
                 .join(ItemsORM, ItemsTagsORM.item_id == ItemsORM.item_id)
             )
-        else:
-            query = query.distinct()
         
         query = query.limit(search_params.limit).offset(search_params.offset)
         
         if order_by == "score_asc":
-            query = query.order_by(ItemsORM.score.asc())
+            query = query.order_by(ItemsORM.score.asc().nulls_last())
         elif order_by == "score_desc":
-            query = query.order_by(ItemsORM.score.desc())
+            query = query.order_by(ItemsORM.score.desc().nulls_last())
         elif order_by == "post_date_asc":
             query = query.order_by(ItemsORM.created_at.asc())
         # order_by == "post_date_desc"

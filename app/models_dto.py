@@ -124,4 +124,4 @@ class ItemSearchParamsDTO(BaseModel):
     include_tags: list[Str_50] = []
     exclude_tags: list[Str_50] = []
     offset: int = 0
-    limit: int = Field(ge=1, le=20)
+    limit: int = Field(ge=1, le=20, default=20)
