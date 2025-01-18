@@ -107,7 +107,17 @@ class ImageUtils(ImageUtilsInterface):
         # (x, y)
         random_pixel_location = self.determined_random_pixel(image.size, dynamic_salt)
         pixel = image.getpixel(random_pixel_location)
-        changed_pixel = (pixel[0], pixel[1], pixel[2] + 1)
+        
+        # sometimes a pixel is a gray grdation, not just rgb
+        if isinstance(pixel, int):
+            changed_pixel = pixel + 1
+        elif len(pixel) == 3:
+            # RGB
+            changed_pixel = (pixel[0], pixel[1], pixel[2] + 1)
+        elif len(pixel) == 4:
+            # RGBA
+            changed_pixel = (pixel[0], pixel[1], pixel[2] + 1, pixel[3])
+        
         image.putpixel(random_pixel_location, changed_pixel)
         
         return image
