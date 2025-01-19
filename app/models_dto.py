@@ -49,6 +49,15 @@ class ItemPutDTO(ItemBaseDTO):
         return value
     
     
+    @field_validator("tags", "characters", "copyright", "meta", mode="after")
+    @classmethod
+    def tags_to_lower(cls, value: list[str]) -> list[str]:
+        for i, item in enumerate(value):
+            value[i] = item.lower()
+        
+        return value
+    
+    
     @field_validator("source", mode="after")
     @classmethod
     def http_to_string(cls, value: HttpUrl) -> str:
@@ -120,8 +129,8 @@ class OrderBy(Enum):
 
 
 class ItemSearchParamsDTO(BaseModel):
-    order_by: OrderBy
+    order_by: OrderBy = OrderBy("post_date_desc")
     include_tags: list[Str_50] = []
     exclude_tags: list[Str_50] = []
     offset: int = 0
-    limit: int = Field(ge=1, le=20, default=20)
+    limit: int = Field(ge=1, default=15)

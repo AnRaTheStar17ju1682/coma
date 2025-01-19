@@ -94,7 +94,7 @@ class ImageUtils(ImageUtilsInterface):
     
     @staticmethod
     def generate_thumbnail(image):
-        size = 128, 128
+        size = 180, 180
         thmb = image.copy()
         thmb.thumbnail(size)
         return thmb
