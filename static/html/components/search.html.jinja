@@ -1,0 +1,13 @@
+{% set included = request.query_params.get('include') %}
+{% set excluded = request.query_params.get('exclude') %}
+<form action="/items/" method="GET">
+    <div class="input-div">
+        <input class="styled-input" id="include" name="include" size="30" type="text" placeholder="Include"
+            value="{{ included if included else '' }}">
+    </div>
+    <div class="input-div">
+        <input class="styled-input" id="exclude" name="exclude" size="30" type="text" placeholder="Exclude"
+            value="{{ excluded if excluded else '' }}">
+    </div>
+    <input type="submit" value="Search">
+</form>

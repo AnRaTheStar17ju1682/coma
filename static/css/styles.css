@@ -1,0 +1,79 @@
+@font-face {
+    font-family: 'after_shokregular';
+    src: url('../After_Shok-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body, input[type="submit"] {
+    font-family: 'after_shokregular';
+}
+
+input[type="submit"] {
+    padding: 10px 94px;
+    background-color: #c90040c6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+input[type="submit"]:active {
+    transform: scale(0.90);
+}
+
+input[type="submit"]:hover {
+    background-color: #c9004093;
+}
+
+.input-div {
+    padding-bottom: 5px;
+}
+
+.styled-input {
+    width: 237px;
+    height: 10px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#nav-box {
+    background: radial-gradient(circle at center, #a99cbbaa, #a99cbb 70%, #6c468a);
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: box-shadow 0.3s ease;
+}
+
+#nav {
+    margin-top: 20px;
+}
+
+#nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+#nav ul li a {
+    text-decoration: none;
+    color: rgba(67, 12, 34, 0.93);
+    font-weight: bold;
+}
+
+#nav ul li {
+    background: #ffffff3d;
+    border-radius: 5px;
+    border: 3px solid transparent;
+    padding: 2px;
+}
+
+#nav ul li:hover {
+    background-color: #ff889ea4;
+    animation: glow 0.5s infinite;
+}

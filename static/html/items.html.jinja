@@ -1,0 +1,48 @@
+{% extends "/components/base.html.jinja" %}
+{% block style %}items{% endblock %}
+{% block body %}
+    {% set page = request.query_params.get("page") | int or 1 %}
+    
+    <div id="nav-box">
+        <nav id="nav">
+            <ul>
+                <li><a href="/posts">Posts</a></li>
+                <li><a href="/artists">Artists</a></li>
+                <li><a href="/tags">Tags</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div id="items-earch-container">
+        {% include "components/search.html.jinja" %}
+        <div class="arrows-container">
+            {% if page > 1 %}
+                <a href="{{ request.url.include_query_params(page=page-1) }}" class="arrow left-arrow">←</a>
+            {% endif %}
+            {% if item_hashes|length == 15 %}
+                <a href="{{ request.url.include_query_params(page=page+1) }}" class="arrow right-arrow">→</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="content">
+        <!-- 15 posts maximum -->
+        <div class="item-gallery">
+        {% if item_hashes %}
+            {% for item_hash in item_hashes %}
+                <div class="item-thumbnail">
+                    <a href="{{ url_for('download_item', item_hash=item_hash) }}">
+                        <img src="{{ url_for('download_thumbnail', item_hash=item_hash) }}" onerror="this.src='/static/images/404.png'">
+                    </a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="item-thumbnail">
+                <a href="not-found">
+                    <img src="/static/images/404.png">
+                </a>
+            </div>
+        {% endif %}
+        </div>
+    </div>
+{% endblock %}

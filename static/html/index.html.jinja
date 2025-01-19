@@ -1,0 +1,15 @@
+{% extends "/components/base.html.jinja" %}
+{% block style %}index{% endblock %}
+{% block body %}
+    <div id="image-box">
+        <div>
+            <a href="{{ url_for('posts') }}">
+                <img src="/static/images/index_image.png" alt="Coma" style="width: 100%; max-width: 700px;">
+            </a>
+        </div>
+        <p><strong><i>Past better. Always.</i></strong></p>
+        <div id="image-box-search-container">
+            {% include "/components/search.html.jinja" %}
+        </div>
+    </div>
+{% endblock %}
