@@ -1,12 +1,30 @@
 @font-face {
     font-family: 'after_shokregular';
-    src: url('../After_Shok-webfont.woff') format('woff');
+    src: url('../After_Shok-webfont.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
 }
 
+html, body {
+    height: 100%;
+    background: radial-gradient(circle at center, #c8c5e1, #a79bb8, #6c468a);
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+label {
+    font-weight: bold;
+}
+
 body, input[type="submit"] {
     font-family: 'after_shokregular';
+}
+
+input[type="text"], input[type="number"], textarea, select {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
 }
 
 input[type="submit"] {
@@ -35,9 +53,6 @@ input[type="submit"]:hover {
     width: 237px;
     height: 10px;
     padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
 }
 
 #nav-box {
@@ -73,7 +88,15 @@ input[type="submit"]:hover {
     padding: 2px;
 }
 
-#nav ul li:hover {
+#nav a img {
+    height: 60px;
+    width: 60px;
+    background: #ffffff3d;
+    border-radius: 5px;
+    border: 2px solid transparent;
+}
+
+#nav a img:hover, #nav ul li:hover {
     background-color: #ff889ea4;
     animation: glow 0.5s infinite;
 }

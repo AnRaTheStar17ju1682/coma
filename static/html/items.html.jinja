@@ -3,15 +3,7 @@
 {% block body %}
     {% set page = request.query_params.get("page") | int or 1 %}
     
-    <div id="nav-box">
-        <nav id="nav">
-            <ul>
-                <li><a href="/posts">Posts</a></li>
-                <li><a href="/artists">Artists</a></li>
-                <li><a href="/tags">Tags</a></li>
-            </ul>
-        </nav>
-    </div>
+    {% include "components/navigation.html.jinja" %}
 
     <div id="items-earch-container">
         {% include "components/search.html.jinja" %}

@@ -1,11 +1,3 @@
-html, body {
-    height: 100%;
-    background: radial-gradient(circle at center, #c8c5e1, #a79bb8, #6c468a);
-    margin: 0;
-    padding: 0;
-    color: #333;
-}
-
 #content {
     padding: 20px;
     max-width: 1200px;
