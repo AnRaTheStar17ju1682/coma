@@ -17,7 +17,7 @@ async def index(request: Request):
     return html
 
 
-@router.get("/items/", response_class=FileResponse)
+@router.get("/items/", response_class=HTMLResponse)
 async def posts(
     request: Request,
     item_hashes: Annotated[list[str], Depends(tag_search_api_request)]
@@ -27,4 +27,13 @@ async def posts(
         "item_hashes": item_hashes,
     }
     html = templates.TemplateResponse("items.html.jinja", context=context)
+    return html
+
+
+@router.get("/upload", response_class=HTMLResponse)
+async def test_page(request: Request):
+    context = {
+        "request": request,
+    }
+    html = templates.TemplateResponse("upload.html.jinja", context=context)
     return html

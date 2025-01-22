@@ -1,0 +1,138 @@
+#content {
+    position: absolute;
+    padding: 1%;
+    display: flex;
+    gap: 1%;
+    top: 103px;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+#imageSettings {
+    position: relative;
+    flex: 1;
+}
+
+#imagePreviewContainer {
+    width: 100%;
+    border-radius: 10px;
+    background: #ffffff3d;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 55%;
+}
+
+#imagePreview {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: none;
+}
+
+#bottom_settings {
+    width: 100%;
+    height: auto;
+    position: absolute;
+    top: 55%;
+    bottom: 0;
+    margin-top: 2.06%;
+    gap: 2.06%;
+
+    
+    display: flex;
+    flex-direction: row;
+    
+}
+
+.someform {
+    gap: 10px;
+    background: #ffffff3d;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    flex: 1;
+    padding: 2.06%;
+}
+
+#subform {
+    gap: 10px;
+    background: #ffffff3d;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 30%;
+    padding: 2.06%;
+    display: grid;
+    align-items: center;
+}
+
+#subform div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+#subform div * {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#uploadForm {
+    padding: 1%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #ffffff3d;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.input-div,
+#uploadForm button {
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: auto;
+}
+
+.input-div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+#resolution {
+    gap: 5px;
+    display: flex;
+    padding-bottom: 5px;
+}
+
+#resolution * {
+    width: 40%;
+}
+
+input[type="text"], input[type="number"], textarea, select {
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+#imageDescription, #tags {
+    height: 120px;
+}
+
+#itemUpload {
+    display: none;
+}
+
+.glow-btn.has-file {
+    border-color: #fff;
+    background: linear-gradient(45deg, #ff1a3d, #ff5a78);
+}

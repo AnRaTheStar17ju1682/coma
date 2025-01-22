@@ -1,0 +1,89 @@
+{% extends "/components/base.html.jinja" %}
+{% block style %}upload{% endblock %}
+{% block head_extras -%}
+    <link rel="stylesheet" href="/static/css/magic_button.css">
+    <script src="/static/js/glow_btns_sparkles.js" defer></script>
+    <script src="/static/js/upload_item.js" defer></script>
+{% endblock -%}
+{% block body %}
+    {% include "components/navigation.html.jinja" %}
+    
+    <div id="content">
+        <div id="imageSettings">
+            <div id="imagePreviewContainer">
+                <img id="imagePreview" src="#" alt="Image Preview">
+            </div>
+
+            <div id="bottom_settings">
+                <form id="subform">
+                    <div>
+                        <label for="score">Score (1-10):</label>
+                        <input type="number" id="score" min="1" max="10" required>
+                    </div>
+
+                    <div>
+                        <label id="resolutionLabel">Resolution:</label>
+                        <div id="resolution" aria-labelledby="resolutionLabel">
+                            <select id="resolutionPreset" onchange="updateResolution()">
+                                <option value="custom">CSTM</option>
+                                <option value="1920x1080">FHD</option>
+                                <option value="1280x720">HD</option>
+                                <option value="3840x2160">UHD</option>
+                            </select>
+
+                            <input type="number" id="resolutionX" placeholder="W" required>
+                            <input type="number" id="resolutionY" placeholder="H" required>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="compressMode">Compress Mode:</label>
+                        <select id="compressMode" required>
+                            <option value="1">Mode 1</option>
+                            <option value="2">Mode 2</option>
+                            <option value="3">Mode 3</option>
+                            <option value="4">Mode 4</option>
+                        </select>
+                    </div>
+                </form>
+
+                <div class="someform">
+
+                </div>
+            </div>
+
+        </div>
+
+        <form id="uploadForm">
+            <div class="upload-wrapper">
+                <button class="glow-btn" id="uploadBtn" type="button">UPLOAD</button>
+                <input type="file" id="itemUpload">
+            </div>
+            <div class="input-div">
+                <label for="name">Name:</label>
+                <input type="text" id="name" placeholder="Image Name" required>
+            </div>
+            <div class="input-div">
+                <label for="description">Description:</label>
+                <textarea id="description" placeholder="Image Description" required></textarea>
+            </div>
+            <div class="input-div">
+                <label for="tags">Tags:</label>
+                <textarea id="tags" placeholder="Enter tags"></textarea>
+            </div>
+            <div class="input-div">
+                <label for="characters">Characters:</label>
+                <input type="text" id="characters" placeholder="Enter characters">
+            </div>
+            <div class="input-div">
+                <label for="meta">Meta:</label>
+                <input type="text" id="meta" placeholder="Enter meta">
+            </div>
+            <div class="input-div">
+                <label for="copyright">Copyright:</label>
+                <input type="text" id="copyright" placeholder="Enter copyright">
+            </div>
+            <button class="glow-btn" id="send_button" type="button" value="Send" style="padding: 20px 50px; font-size: 24px;">SEND</button>
+        </form>
+    </div>
+{% endblock %}

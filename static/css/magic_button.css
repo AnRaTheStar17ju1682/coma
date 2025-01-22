@@ -1,0 +1,58 @@
+:root {
+    --c: #ff5a78;
+    --g: rgba(255, 90, 120, 0.75);
+}
+
+.upload-wrapper {
+    filter: drop-shadow(0 0 12px var(--g));
+}
+
+.glow-btn {
+    font-family: 'after_shokregular';
+    width: 100%;
+    position: relative;
+    padding: 20px 50px;
+    background: linear-gradient(45deg, #ff3a5c, #ff7b95);
+    border: 3px solid var(--c);
+    color: #fff;
+    font-size: 24px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: 0.5s;
+    text-shadow: 0 0 10px var(--g);
+    animation: glow 2s ease-in-out infinite, inner-glow 3s ease infinite;
+}
+
+.glow-btn:hover {
+    background: linear-gradient(45deg, #ff2a4c, #ff6b85);
+    box-shadow: 0 0 25px 7px var(--g), inset 0 0 15px var(--g);
+}
+
+.glow-btn::before {
+    content: " ";
+    margin-right: 15px;
+    font-size: 28px;
+}
+
+.spark {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: spark 0.6s linear forwards;
+    filter: drop-shadow(0 0 5px var(--g));
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 22px 5px var(--g); }
+    50% { box-shadow: 0 0 35px 12px var(--g); }
+}
+
+@keyframes inner-glow {
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes spark {
+    to { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+}
