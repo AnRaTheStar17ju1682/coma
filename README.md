@@ -7,4 +7,4 @@ Self-hosted web application for storing and searching images and files with tags
 ![Items page example with random images](./docs/items_page.webp)
 
 
-![Upload page](./docs/items_page.webp)
+![Upload page](./docs/upload_page.webp)
