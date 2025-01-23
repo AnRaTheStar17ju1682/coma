@@ -90,8 +90,7 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.input-div,
-#uploadForm button {
+.input-div {
     flex-grow: 1;
     flex-shrink: 0;
     flex-basis: auto;
