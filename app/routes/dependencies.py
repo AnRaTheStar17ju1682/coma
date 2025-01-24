@@ -51,7 +51,8 @@ async def tag_search_api_request(
         "offset": 20*(page-1),
         "limit": 15
     }
-    tag_search_url = str(request.url_for("tag_search"))
+    server_port = request.scope.get("server")[1]
+    tag_search_url = str(request.url_for("tag_search").replace(port=server_port))
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(tag_search_url, json=search_params)

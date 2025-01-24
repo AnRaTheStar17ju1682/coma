@@ -1,5 +1,5 @@
 [project]
-name = "coma app"
+name = "coma_app"
 version = "0.1.0"
 description = ""
 readme = "README.md"
@@ -54,6 +54,11 @@ dependencies = [
     "watchfiles==1.0.3",
     "websockets==14.1",
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["static*", "docs*"]
+
 [project.urls]
 Homepage = "https://t.me/chesscore_pisca"
 Documentation = "https://github.com/AnRaTheStar17ju1682/coma#readme"
