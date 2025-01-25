@@ -1,0 +1,29 @@
+services:
+  application:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env
+    environment:
+      DB_HOST: "database"
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: ./app
+    volumes:
+      - content:/coma/content
+
+  database:
+    image: "postgres"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_USER: ${DB_USER}
+    volumes:
+      - coma_database:/var/lib/postgresql/data
+
+volumes:
+  content:
+  coma_database:
