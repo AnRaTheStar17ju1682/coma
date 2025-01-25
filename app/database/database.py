@@ -11,8 +11,10 @@ session_fabric = async_sessionmaker(engine)
 
 
 async def create_tables():
+    engine.echo = False
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    engine.echo = True
 
 
 async def drop_tables():
