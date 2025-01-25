@@ -6,3 +6,4 @@ app.egg-info
 comavenv
 unmain.py
 content
+rundocker.sh
