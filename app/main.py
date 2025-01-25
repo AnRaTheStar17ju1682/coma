@@ -5,8 +5,10 @@ import uvicorn
 
 from routes import api, files, frontend
 
+from lifespan import lifespan
 
-app = FastAPI(title="Coma-api")
+
+app = FastAPI(title="Coma-api", lifespan=lifespan)
 
 app.include_router(api.router)
 app.include_router(files.router)

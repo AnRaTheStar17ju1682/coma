@@ -28,12 +28,6 @@ class RepositoryInterface(ABC):
         super().__init__()
     
     
-    async def create_tables(self):
-        async with self.engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
-            await conn.run_sync(Base.metadata.create_all)
-    
-    
     @abstractmethod
     async def add_items(self, *args: tuple[ItemAddToDB, ItemHashStr]) -> list[int]:
         raise NotImplementedError
