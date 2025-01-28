@@ -9,7 +9,7 @@ services:
       DB_HOST: "database"
     develop:
       watch:
-        - action: sync
+        - action: rebuild
           path: .
           target: ./app
     volumes:
@@ -23,6 +23,20 @@ services:
       POSTGRES_USER: ${DB_USER}
     volumes:
       - coma_database:/var/lib/postgresql/data
+
+  redis-images:
+    image: "redis"
+    restart: "always"
+    expose:
+      - 6379
+    command: ["redis-server", "--appendonly", "no", "--save", "", "--maxmemory", "100mb", "--maxmemory-policy", "allkeys-lru"]
+  
+  redis:
+    image: "redis"
+    restart: "always"
+    expose:
+      - 6379
+    command: ["redis-server", "--appendonly", "no", "--save", "", "--maxmemory", "25mb", "--maxmemory-policy", "allkeys-lru"]
 
 volumes:
   content:

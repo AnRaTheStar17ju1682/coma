@@ -1,10 +1,14 @@
 from typing import Annotated
 
+import json
+
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Depends, Form, Body
 
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from psycopg.errors import UniqueViolation
+
+from redis.asyncio import Redis
 
 from models_dto import (
     ItemPostDTO,
@@ -16,7 +20,7 @@ from models_dto import (
 from services.image_service import ImagesService
 from services.search_service import SearchService
 
-from routes.dependencies import image_service_dependency, search_service_dependency
+from routes.dependencies import image_service_dependency, search_service_dependency, redis_text_dependency
 
 
 router = APIRouter(prefix="/api/items", tags=["api"])
@@ -70,12 +74,21 @@ async def delete_item(
 @router.get("/{item_hash}", status_code=200)
 async def get_item_data(
     item_hash: str,
-    image_service: Annotated[ImagesService, Depends(image_service_dependency)]
+    image_service: Annotated[ImagesService, Depends(image_service_dependency)],
+    r: Annotated[Redis, Depends(redis_text_dependency)]
 ):
+    r_key =  "item_data:" + item_hash
+    
     try:
-        item_data = await image_service.get_image_data(image_hash=item_hash)
+        if item_data_json := await r.get(r_key):
+            pass
+        else:
+            item_data = await image_service.get_image_data(image_hash=item_hash)
+            item_data_json = item_data.model_dump_json()
+            
+            await r.set(r_key, item_data_json, ex=5)
         
-        return item_data
+        return item_data_json
     except NoResultFound as err:
         raise HTTPException(
             status_code=404,
@@ -109,7 +122,15 @@ async def upadte_item_data(
 @router.post("/tag_search")
 async def tag_search(
     search_params: ItemSearchParamsDTO,
-    search_service: Annotated[SearchService, Depends(search_service_dependency)]
+    search_service: Annotated[SearchService, Depends(search_service_dependency)],
+    r: Annotated[Redis, Depends(redis_text_dependency)]
 ) -> list[str]:
-    item_hashes = await search_service.search_by_tags(search_params)
+    r_key = "search:" + search_params.model_dump_json()
+    
+    if item_hashes := await r.get(r_key):
+        item_hashes = json.loads(item_hashes.decode())
+    else:
+        item_hashes = await search_service.search_by_tags(search_params)
+        await r.set(r_key, json.dumps(item_hashes), ex=5)
+    
     return item_hashes

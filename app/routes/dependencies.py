@@ -20,6 +20,16 @@ from interfaces import RepositoryInterface
 from services.image_service import ImagesService
 from services.search_service import SearchService
 
+from redis_clients import redis_files, redis_text
+
+
+async def redis_files_dependency():
+    return redis_files
+
+
+async def redis_text_dependency():
+    return redis_text
+
 
 async def repository_dependency() -> RepositoryInterface:
     return SQLAlchemyRepository(engine, session_fabric)
