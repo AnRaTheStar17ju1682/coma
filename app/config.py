@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASS: str
     DB_NAME: str
+    ENGINE_ECHO: bool
+    LOGGING_LEVEL: int
     IMAGE_SALT: str
     CONTENT_DIR: str
     DEFAULT_IMAGES_QUALITY: int

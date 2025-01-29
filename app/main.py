@@ -1,3 +1,9 @@
+# i need it, because the engine initializes while modules are being imported
+import logging
+from common import configure_logger
+loger = logging.getLogger()
+configure_logger(loger)
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
