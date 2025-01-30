@@ -1,8 +1,4 @@
-# i need it, because the engine initializes while modules are being imported
 import logging
-from common import configure_logger
-loger = logging.getLogger()
-configure_logger(loger)
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -13,6 +9,11 @@ from routes import api, files, frontend
 
 from lifespan import lifespan
 
+from common import configure_logger
+
+
+logger = logging.getLogger()
+configure_logger(logger)
 
 app = FastAPI(title="Coma-api", lifespan=lifespan)
 
