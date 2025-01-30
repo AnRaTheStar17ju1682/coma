@@ -7,6 +7,7 @@ services:
       - ./.env
     environment:
       DB_HOST: "database"
+      LOGS_DIR: "../logs"
     develop:
       watch:
         - action: rebuild
@@ -14,6 +15,7 @@ services:
           target: ./app
     volumes:
       - content:/coma/content
+      - logs:/logs
 
   database:
     image: "postgres"
@@ -41,3 +43,4 @@ services:
 volumes:
   content:
   coma_database:
+  logs:

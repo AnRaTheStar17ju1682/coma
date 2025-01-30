@@ -7,6 +7,7 @@ RUN pip install --no-cache-dir .
 
 RUN mkdir ./content
 RUN mkdir ./content/thumbnails
+RUN mkdir ../logs
 
 COPY static ./static
 COPY app ./app
