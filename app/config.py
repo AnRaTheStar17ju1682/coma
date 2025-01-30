@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     LOGGING_LEVEL: int
     IMAGE_SALT: str
     CONTENT_DIR: str
+    LOGS_DIR: str
     DEFAULT_IMAGES_QUALITY: int
     DEFAULT_RESIZE_RESOLUTION: Optional[tuple[int, int]] 
     

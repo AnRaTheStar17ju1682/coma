@@ -2,7 +2,10 @@ import logging
 
 import datetime
 
+from config import settings
 
+
+LOGS_DIR = settings.LOGS_DIR
 FORMAT = "%(levelname)-7s| %(module)15s:%(funcName)-20s:%(lineno)-4s | [%(asctime)s] | MSG = %(message)s"
 COLORS = {
     "DEBUG":    "\033[36m",  # Cyan
@@ -24,7 +27,7 @@ class FileFormatter(logging.Formatter):
 
 
 def configure_logger(logger: logging.Logger, level: int = logging.DEBUG):
-    file_handler = logging.FileHandler(f"{datetime.date.today()}.log", mode="a")
+    file_handler = logging.FileHandler(f"{LOGS_DIR}/{datetime.date.today()}.log")
     console_handler = logging.StreamHandler()
     
     file_formatter = FileFormatter(FORMAT)
