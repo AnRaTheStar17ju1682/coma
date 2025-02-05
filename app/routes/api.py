@@ -34,7 +34,7 @@ async def upload_item(
     save_mode: Annotated[FileSavingParamsDTO, Depends()]
 ):
     try:
-        item_hash, item_id = await image_service.post_image(item, background_tasks, save_mode)
+        item_hash, item_id = await image_service.post_image(item, save_mode)
     except IntegrityError as err:
         if isinstance(err.orig, UniqueViolation):
             raise HTTPException(

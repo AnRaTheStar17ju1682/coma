@@ -77,6 +77,11 @@ class ImageUtilsInterface(ABC):
     
     
     @abstractmethod
+    def create_image(self, image_bytes: bytes) -> Image.Image:
+        raise NotImplementedError
+    
+    
+    @abstractmethod
     def save_to_disk(
         self,
         content_dir: str, 
@@ -86,29 +91,6 @@ class ImageUtilsInterface(ABC):
         *,
         mode: FileSavingParamsDTO
     ) -> None:
-        raise NotImplementedError
-    
-    
-    @staticmethod
-    @abstractmethod
-    def uploadfile_to_image(image_file: UploadFile) -> Image.Image:
-        raise NotImplementedError
-    
-    
-    @abstractmethod
-    def get_dynamic_salt(self, image: str) -> str:
-        raise NotImplementedError
-    
-    
-    @staticmethod
-    @abstractmethod
-    def calculate_image_hash(image: Image.Image) -> str:
-        raise NotImplementedError
-    
-    
-    @staticmethod
-    @abstractmethod
-    def determined_random_pixel(size: tuple[int, int], dynamic_salt: str) -> tuple[int, int]:
         raise NotImplementedError
     
     
@@ -124,8 +106,9 @@ class ImageUtilsInterface(ABC):
         raise NotImplementedError
     
     
+    @staticmethod
     @abstractmethod
-    def get_salted_image(self, image: Image.Image) -> Image.Image:
+    def salt_image(image: Image.Image) -> None:
         raise NotImplementedError
     
     

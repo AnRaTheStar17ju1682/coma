@@ -1,6 +1,4 @@
-from random import Random
-
-import hashlib
+from io import BytesIO
 
 from PIL import Image
 
@@ -8,13 +6,19 @@ from os import remove
 
 from glob import glob
 
-
 from interfaces import ImageUtilsInterface
 
 from config import settings
 
 
 class ImageUtils(ImageUtilsInterface):
+    def create_image(self, img_bytes):
+        img = Image.open(BytesIO(img_bytes))
+        self.salt_image(img)
+        
+        return img
+    
+    
     def save_to_disk(self, content_dir, image_hash, image, thumbnail, *, mode):
         thumbnail_path = content_dir+"/thumbnails/"+f"thumbnail_{image_hash}.webp"
         image_path = content_dir+"/"+f"{image_hash}.webp"
@@ -35,7 +39,7 @@ class ImageUtils(ImageUtilsInterface):
         
         
         if quality_type := mode.compress:
-            if quality_type == "quiality":
+            if quality_type == "quality":
                 quality = 85
             elif quality_type == "balance":
                 quality = 75
@@ -46,32 +50,6 @@ class ImageUtils(ImageUtilsInterface):
             
         image.save(image_path, method=6, quality=quality)
         thumbnail.save(thumbnail_path, method=6, quality=100)
-    
-    
-    @staticmethod
-    def uploadfile_to_image(image_file):
-        return Image.open(image_file.file)
-
-    
-    def get_dynamic_salt(self, image_hash: str):
-        string = image_hash + self.static_salt
-        dynamic_salt = hashlib.sha256(string.encode())
-        return dynamic_salt.hexdigest()
-    
-    
-    @staticmethod
-    def calculate_image_hash(image):
-        hash = hashlib.sha256(image.tobytes())
-        return hash.hexdigest()
-
-
-    @staticmethod
-    def determined_random_pixel(size, dynamic_salt):
-        random = Random(dynamic_salt)
-        width, height = size
-        random_pixel = random.randint(0, width-1), random.randint(0, height-1)
-        
-        return random_pixel
     
     
     @staticmethod
@@ -98,15 +76,12 @@ class ImageUtils(ImageUtilsInterface):
         thmb = image.copy()
         thmb.thumbnail(size)
         return thmb
-     
-     
-    def get_salted_image(self, image): 
-        image_hash = self.calculate_image_hash(image)
-        dynamic_salt = self.get_dynamic_salt(image_hash)
-        
-        # (x, y)
-        random_pixel_location = self.determined_random_pixel(image.size, dynamic_salt)
-        pixel = image.getpixel(random_pixel_location)
+
+
+    @staticmethod
+    def salt_image(image): 
+        cords = (1, 1)
+        pixel = image.getpixel(cords)
         
         # sometimes a pixel is a gray grdation, not just rgb
         if isinstance(pixel, int):
@@ -118,10 +93,10 @@ class ImageUtils(ImageUtilsInterface):
             # RGBA
             changed_pixel = (pixel[0], pixel[1], pixel[2] + 1, pixel[3])
         
-        image.putpixel(random_pixel_location, changed_pixel)
+        image.putpixel(cords, changed_pixel)
         
         return image
-    
+
     
     @staticmethod
     def delete_image_from_disk(content_dir, image_hash):

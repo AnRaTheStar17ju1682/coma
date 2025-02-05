@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     DEFAULT_RESIZE_RESOLUTION: Optional[tuple[int, int]]
     REDIS: str
     REDIS_FILES: str
+    CELERY_BROKER_URL: str
+    CELERY_RESULT_BACKEND: str
     
     
     @computed_field

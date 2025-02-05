@@ -1,3 +1,5 @@
+import hashlib
+
 from PIL import Image
 
 from asyncio import to_thread
@@ -10,6 +12,8 @@ from interfaces import ImageUtilsInterface, RepositoryInterface
 from models_dto import ItemPostDTO, ItemAddToDB, ItemGetDTO, ItemPutDTO, ItemUpdateInDB, FileSavingParamsDTO
 
 from config import settings
+
+from tasks.image_tasks import process_image
 
 
 content_dir = settings.CONTENT_DIR
@@ -28,21 +32,14 @@ class ImagesService():
     async def post_image(
         self,
         image: ItemPostDTO,
-        background_tasks: BackgroundTasks,
         save_mode: FileSavingParamsDTO
     ) -> tuple[str, int]:
+        img_bytes = await image.file.read()
+        img_hash = hashlib.sha256(img_bytes).hexdigest()
         image_model_for_db = ItemAddToDB.model_validate(image.model_dump(exclude={"file"}, exclude_unset=True))
-        raw_img = self.image_utils.uploadfile_to_image(image.file)
-        img = self.image_utils.get_salted_image(raw_img)
-        img_hash = self.image_utils.calculate_image_hash(img)
-        thumbnail = self.image_utils.generate_thumbnail(img)
         
         created_item_id = await self.repository.add_one_item(image_model_for_db, img_hash)
-        background_tasks.add_task(
-            self.image_utils.save_to_disk,
-            content_dir, img_hash, img, thumbnail,
-            mode=save_mode
-        )
+        process_image.delay(img_bytes, img_hash, save_mode.model_dump_json())
         
         return img_hash, created_item_id
     

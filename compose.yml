@@ -1,3 +1,8 @@
+x-environment:
+  &celery-worker-envs
+  CELERY_BROKER_URL: "redis://redis-celery:6379"
+  CELERY_RESULT_BACKEND: "redis://redis-celery:6379"
+
 services:
   application:
     build: .
@@ -8,6 +13,9 @@ services:
     environment:
       DB_HOST: "database"
       LOGS_DIR: "../logs"
+      REDIS: "redis"
+      REDIS_FILES: "redis-images"
+      <<: *celery-worker-envs
     develop:
       watch:
         - action: rebuild
@@ -16,9 +24,26 @@ services:
     volumes:
       - content:/coma/content
       - logs:/logs
+    depends_on:
+      - database
+      - redis-images
+      - redis
 
+  celery_worker:
+    build: .
+    env_file:
+      - ./.env
+    environment:
+      LOGS_DIR: "../logs"
+      <<: *celery-worker-envs
+    volumes:
+      - content:/coma/content
+      - logs:/logs
+    command: python ./app/_celery.py
+    
   database:
     image: "postgres"
+    restart: "always"
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_PASSWORD: ${DB_PASS}
@@ -31,7 +56,7 @@ services:
     restart: "always"
     expose:
       - 6379
-    command: ["redis-server", "--appendonly", "no", "--save", "", "--maxmemory", "100mb", "--maxmemory-policy", "allkeys-lru"]
+    command: ["redis-server", "--appendonly", "no", "--save", "", "--maxmemory", "25mb", "--maxmemory-policy", "allkeys-lru"]
   
   redis:
     image: "redis"
@@ -39,8 +64,18 @@ services:
     expose:
       - 6379
     command: ["redis-server", "--appendonly", "no", "--save", "", "--maxmemory", "25mb", "--maxmemory-policy", "allkeys-lru"]
+  
+  redis-celery:
+    image: "redis"
+    restart: "always"
+    expose:
+      - 6379
+    volumes:
+      - tasks:/data
+    command: ["redis-server", "--appendonly", "no", "--save", "300 1", "--maxmemory", "50mb", "--maxmemory-policy", "noeviction"]
 
 volumes:
   content:
   coma_database:
   logs:
+  tasks:
