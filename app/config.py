@@ -16,7 +16,9 @@ class Settings(BaseSettings):
     CONTENT_DIR: str
     LOGS_DIR: str
     DEFAULT_IMAGES_QUALITY: int
-    DEFAULT_RESIZE_RESOLUTION: Optional[tuple[int, int]] 
+    DEFAULT_RESIZE_RESOLUTION: Optional[tuple[int, int]]
+    REDIS: str
+    REDIS_FILES: str
     
     
     @computed_field
