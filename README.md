@@ -1,4 +1,4 @@
-Self-hosted web application for storing and searching images and files with tags.
+Self-hosted web application for storing and searching images and files with tags. (alpha)
 
 
 ![Main page image](./docs/main_page.webp)
